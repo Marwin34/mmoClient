@@ -85,12 +85,14 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="actor.cpp" />
+    <ClCompile Include="anims.cpp" />
     <ClCompile Include="client.cpp" />
     <ClCompile Include="level.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="actor.h" />
+    <ClInclude Include="anims.h" />
     <ClInclude Include="client.h" />
     <ClInclude Include="level.h" />
   </ItemGroup>

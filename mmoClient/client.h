@@ -19,6 +19,7 @@ class Client{
 	//Actor *me;
 
 	int myId; // Id of client charakters.
+	int wsadIndex; // Index of WSAD button that is pressed.
 
 	bool focused; // Determine if window have focus.
 

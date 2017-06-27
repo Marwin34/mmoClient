@@ -10,6 +10,7 @@ Client::Client() : r_thread(&Client::receive, this) {
 	actors.resize(0);
 	focused = 1;
 	test.init(0);
+	wsadIndex = 4;
 }
 
 Client::~Client(){
@@ -40,12 +41,19 @@ void Client::run(){
 			}
 			if (event.type == sf::Event::LostFocus) focused = 0; // Loseing focus.
 			if (event.type == sf::Event::GainedFocus) focused = 1; // Gaining focus.
+			if (focused) {
+				wsadIndex = 4;
+				if (sf::Keyboard::isKeyPressed(sf::Keyboard::W)) wsadIndex = 0;
+				if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)) wsadIndex = 1;
+				if (sf::Keyboard::isKeyPressed(sf::Keyboard::S)) wsadIndex = 2;
+				if (sf::Keyboard::isKeyPressed(sf::Keyboard::A)) wsadIndex = 3;
+			}
 		}
 
 		mainTimer = mainClock.getElapsedTime(); // Get the main time;
 		if (mainTimer.asMilliseconds() - lastUpdate.asMilliseconds() >= 20){ // Update scene and send data only every 50 milliseconds;
 			for (unsigned i = 0; i < actors.size(); i++){
-				if (actors[i].getId() == myId && focused)actors[i].control(&test.getObstacles()); // Update action of player.
+				if (actors[i].getId() == myId && focused)actors[i].control(); // Update action of player.
 				actors[i].update(); // Update players (pos, render state etc)
 				//actors[i].showStats(); // Just for checking player stats.
 			}
@@ -106,9 +114,10 @@ void Client::receive(){
 
 void Client::send(){
 	sf::Packet packet;
-	for (unsigned i = 0; i < actors.size(); i++){
+	/*for (unsigned i = 0; i < actors.size(); i++){
 		if (actors[i].getId() == myId)packet << actors[i];
-	}
+	}*/
+	packet << wsadIndex;
 	socket.send(packet);
 }
 
