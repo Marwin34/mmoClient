@@ -5,6 +5,7 @@
 
 #include "actor.h"
 #include "level.h"
+#include "assets.h"
 
 class Client{
 	sf::RenderWindow window; // Create a window.
@@ -24,6 +25,8 @@ class Client{
 	bool focused; // Determine if window have focus.
 
 	Map test;
+
+	AssetsManager manager;
 
 	sf::Thread r_thread;
 public:

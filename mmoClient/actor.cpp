@@ -12,11 +12,6 @@ Actor::Actor(){
 	frameW = 0;
 	autoAttackCd = 0;
 	jPressed = false;
-	image.loadFromFile("./img/player.png");
-	texture.loadFromImage(image);
-	sprite.setTextureRect(sf::IntRect(0, 0, image.getSize().x / 4, image.getSize().y / 4));
-	sprite.setOrigin((float)0, (float)(image.getSize().y / 4 - 32));
-
 	autoAttack.init(1, x, y);
 }
 
@@ -27,6 +22,13 @@ Actor::~Actor(){
 
 void Actor::init(){
 
+}
+
+void Actor::createTexture(AssetsManager &container){
+	sprite.setTexture(container["player"]);
+	textureSize = container["player"].getSize();
+	sprite.setTextureRect(sf::IntRect(0, 0, textureSize.x / 4, textureSize.y / 4));
+	sprite.setOrigin((float)0, (float)(textureSize.y / 4 - 32));
 }
 
 void Actor::update(){
@@ -54,7 +56,6 @@ void Actor::update(){
 		frameH = 12;
 	}
 	
-	sprite.setTextureRect(sf::IntRect(frameH / 4 * image.getSize().x / 4, frameW * image.getSize().y / 4, image.getSize().x / 4, image.getSize().y / 4));
 	lastDir = dir;
 }
 
@@ -73,8 +74,8 @@ void Actor::captureData(Actor &data){
 }
 
 void Actor::draw(sf::RenderWindow *win){
+	sprite.setTextureRect(sf::IntRect(frameH / 4 * textureSize.x / 4, frameW * textureSize.y / 4, textureSize.x / 4, textureSize.y / 4));
 	sprite.setPosition(x, y);
-	sprite.setTexture(texture);
 	if (frameW != 3) {
 		win->draw(sprite);
 		autoAttack.draw(win);
@@ -83,8 +84,6 @@ void Actor::draw(sf::RenderWindow *win){
 		autoAttack.draw(win);
 		win->draw(sprite);
 	}
-	
-	
 }
 
 void Actor::showStats(){

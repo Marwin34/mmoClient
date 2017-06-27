@@ -74,7 +74,7 @@ void Animation::update(float xx, float yy, int dir){
 			frameH = 2;
 		}
 	}
-	std::cout << frameH << std::endl;
+	//std::cout << frameH << std::endl;
 	sprite.setTextureRect(sf::IntRect(frameH * image.getSize().x / 3, frameW * image.getSize().y / 4, image.getSize().x / 3, image.getSize().y / 4));
 	sprite.setTexture(texture);
 	sprite.setPosition(x + offsetX, y + offsetY);

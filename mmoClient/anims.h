@@ -3,6 +3,8 @@
 
 #include <SFML/Graphics.hpp>
 
+#include "assets.h"
+
 class Animation {
 	int type;
 	int id;

@@ -30,6 +30,9 @@
     <ClCompile Include="anims.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="assets.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="client.h">
@@ -42,6 +45,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="anims.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="assets.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

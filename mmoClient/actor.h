@@ -16,11 +16,10 @@ class Actor{
 	int frameW, frameH; // Vertical and horizontal frames indicators.
 	int autoAttackCd;
 	bool jPressed;
-	sf::Image image;
-	sf::Sprite sprite;
-	sf::Texture texture;
 
-	sf::Texture test;
+	sf::Sprite sprite;
+
+	sf::Vector2u textureSize;
 
 	Animation autoAttack;
 
@@ -30,6 +29,7 @@ public:
 	Actor();
 	~Actor();
 	void init();
+	void createTexture(AssetsManager&);
 	void update();
 	void control();
 	void captureData(Actor&);

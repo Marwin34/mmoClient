@@ -11,6 +11,7 @@ Client::Client() : r_thread(&Client::receive, this) {
 	focused = 1;
 	test.init(0);
 	wsadIndex = 4;
+	manager.load();
 }
 
 Client::~Client(){
@@ -145,7 +146,10 @@ void Client::transferFromBuffor(std::vector<Actor> &buffor){
 	// Just copy data from buffor to actros.
 	for (unsigned i = 0; i < actors.size(); i++){
 		for (unsigned j = 0; j < buffor.size(); j++){
-			if (actors[i].getId() == buffor[j].getId()) actors[i].captureData(buffor[j]);
+			if (actors[i].getId() == buffor[j].getId()){
+				actors[i].captureData(buffor[j]);
+				actors[i].createTexture(manager);
+			}
 		}
 	}
 }
