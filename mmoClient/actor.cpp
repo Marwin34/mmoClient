@@ -2,7 +2,6 @@
 
 Actor::Actor(){
 	id = 0;
-	mapId = 0;
 	x = 0;
 	y = 0;
 	sprite.setPosition(0, 0);
@@ -10,8 +9,7 @@ Actor::Actor(){
 	lastDir = dir;
 	frameH = 0;
 	frameW = 0;
-	autoAttackCd = 0;
-	jPressed = false;
+	attack = false;
 	autoAttack.init(1, x, y);
 }
 
@@ -32,12 +30,6 @@ void Actor::createTexture(AssetsManager &container){
 }
 
 void Actor::update(){
-
-	if (autoAttackCd){
-		autoAttackCd++;
-		if (autoAttackCd > 10) autoAttackCd = 0;
-	}
-
 	if (lastDir == dir){
 		frameH++;
 	}
@@ -50,8 +42,7 @@ void Actor::update(){
 
 	autoAttack.update(x, y, frameW);
 
-	if (jPressed) {
-		autoAttackCd = 1;
+	if (attack) {
 		autoAttack.start();
 		frameH = 12;
 	}
@@ -60,8 +51,6 @@ void Actor::update(){
 }
 
 void Actor::control(){
-	jPressed = false;
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::J) && !autoAttackCd) jPressed = true;
 }
 
 
@@ -70,7 +59,7 @@ void Actor::captureData(Actor &data){
 	x = data.x;
 	y = data.y;
 	dir = data.dir;
-	mapId = data.mapId;
+	attack = data.attack;
 }
 
 void Actor::draw(sf::RenderWindow *win){
@@ -101,5 +90,5 @@ sf::Packet& operator <<(sf::Packet& packet, const Actor& actor)
 
 sf::Packet& operator >>(sf::Packet& packet, Actor& actor)
 {
-	return packet >> actor.id >> actor.x >> actor.y >> actor.dir >> actor.mapId;
+	return packet >> actor.id >> actor.x >> actor.y >> actor.dir >> actor.attack;
 }

@@ -9,13 +9,11 @@
 class Actor{
 	float x, y; // Position on server side.
 	int id;
-	int mapId; // Id of the map where actor is.
 	int lastCharId;
 	int dir; // Direction received from server, only for animation etc.
 	int lastDir;
 	int frameW, frameH; // Vertical and horizontal frames indicators.
-	int autoAttackCd;
-	bool jPressed;
+	bool attack;
 
 	sf::Sprite sprite;
 

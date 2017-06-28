@@ -9,9 +9,13 @@ Client::Client() : r_thread(&Client::receive, this) {
 	myId = 0;
 	actors.resize(0);
 	focused = 1;
+
 	test.init(0);
 	wsadIndex = 4;
+
 	manager.load();
+
+	mouseButtonIndex = 0;
 }
 
 Client::~Client(){
@@ -48,6 +52,8 @@ void Client::run(){
 				if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)) wsadIndex = 1;
 				if (sf::Keyboard::isKeyPressed(sf::Keyboard::S)) wsadIndex = 2;
 				if (sf::Keyboard::isKeyPressed(sf::Keyboard::A)) wsadIndex = 3;
+				mouseButtonIndex = 0;
+				if (sf::Mouse::isButtonPressed(sf::Mouse::Left))mouseButtonIndex = 1;
 			}
 		}
 
@@ -115,10 +121,7 @@ void Client::receive(){
 
 void Client::send(){
 	sf::Packet packet;
-	/*for (unsigned i = 0; i < actors.size(); i++){
-		if (actors[i].getId() == myId)packet << actors[i];
-	}*/
-	packet << wsadIndex;
+	packet << wsadIndex << mouseButtonIndex;
 	socket.send(packet);
 }
 
@@ -155,6 +158,6 @@ void Client::transferFromBuffor(std::vector<Actor> &buffor){
 }
 
 bool Client::connect(){
-	sf::Socket::Status status = socket.connect("192.168.1.3", 55001); // 
+	sf::Socket::Status status = socket.connect("192.168.1.2", 55001); // 
 	return status == sf::Socket::Done;
 }
