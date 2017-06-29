@@ -9,6 +9,7 @@ Actor::Actor(){
 	lastDir = dir;
 	frameH = 0;
 	frameW = 0;
+	sAttack = false;
 	attack = false;
 	autoAttack.init(1, x, y);
 }
@@ -41,8 +42,9 @@ void Actor::update(){
 	if (dir == 3) frameW = 1;
 
 	autoAttack.update(x, y, frameW);
-
+	//std::cout << " update : " << attack << std::endl;
 	if (attack) {
+		attack = false;
 		autoAttack.start();
 		frameH = 12;
 	}
@@ -50,16 +52,12 @@ void Actor::update(){
 	lastDir = dir;
 }
 
-void Actor::control(){
-}
-
-
 void Actor::captureData(Actor &data){
 	id = data.id;
 	x = data.x;
 	y = data.y;
 	dir = data.dir;
-	attack = data.attack;
+	if (data.sAttack) attack = data.sAttack;
 }
 
 void Actor::draw(sf::RenderWindow *win){
@@ -90,5 +88,5 @@ sf::Packet& operator <<(sf::Packet& packet, const Actor& actor)
 
 sf::Packet& operator >>(sf::Packet& packet, Actor& actor)
 {
-	return packet >> actor.id >> actor.x >> actor.y >> actor.dir >> actor.attack;
+	return packet >> actor.id >> actor.x >> actor.y >> actor.dir >> actor.sAttack;
 }

@@ -13,6 +13,7 @@ class Actor{
 	int dir; // Direction received from server, only for animation etc.
 	int lastDir;
 	int frameW, frameH; // Vertical and horizontal frames indicators.
+	bool sAttack;
 	bool attack;
 
 	sf::Sprite sprite;
@@ -29,7 +30,6 @@ public:
 	void init();
 	void createTexture(AssetsManager&);
 	void update();
-	void control();
 	void captureData(Actor&);
 	void draw(sf::RenderWindow*);
 	void showStats();

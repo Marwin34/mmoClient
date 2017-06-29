@@ -60,7 +60,6 @@ void Client::run(){
 		mainTimer = mainClock.getElapsedTime(); // Get the main time;
 		if (mainTimer.asMilliseconds() - lastUpdate.asMilliseconds() >= 20){ // Update scene and send data only every 50 milliseconds;
 			for (unsigned i = 0; i < actors.size(); i++){
-				if (actors[i].getId() == myId && focused)actors[i].control(); // Update action of player.
 				actors[i].update(); // Update players (pos, render state etc)
 				//actors[i].showStats(); // Just for checking player stats.
 			}
