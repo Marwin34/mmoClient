@@ -67,9 +67,9 @@ void Animation::update(float xx, float yy, int dir){
 	}
 
 	if (timer){
-		frameH = 2 - timer / 2;
+		frameH = 2 - timer;
 		timer++;
-		if (timer > 6){
+		if (timer > 3){
 			timer = 0; // 5 == 5 * 20 milisecons == 100 miliseconds
 			frameH = 2;
 		}
