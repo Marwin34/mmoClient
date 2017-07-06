@@ -28,8 +28,6 @@ class Client{
 
 	Map test;
 
-	AssetsManager manager;
-
 	sf::Thread r_thread;
 public:
 	Client();
@@ -38,7 +36,7 @@ public:
 	void draw(); // Drawing window and dispaying it.
 	void receive(); // Receiving messages.
 	void send(); // Sending messages.
-	void transferFromBuffor(std::vector<Actor>&);
+	void transferFromBuffor(std::vector<ActorTCPData>&);
 	bool connect(); // Connecting to the server.
 };
 

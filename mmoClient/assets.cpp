@@ -29,3 +29,6 @@ sf::Texture& AssetsManager::operator[](std::string data){
 	}
 	else return textures["none"];
 }
+
+//GOLBALNA KLASA
+AssetsManager mainManager;

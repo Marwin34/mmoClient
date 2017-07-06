@@ -18,3 +18,6 @@ public:
 	sf::Font* font();
 	sf::Texture& operator[](std::string);
 };
+
+//PUBLICZNA GLOBALNA
+extern AssetsManager mainManager;
