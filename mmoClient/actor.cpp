@@ -1,5 +1,31 @@
 #include "actor.h"
 
+ActorTCPdatas::ActorTCPdatas(){
+	id = 0;
+	x = 0;
+	y = 0;
+	dir = 4;
+	sAttack = false;
+}
+
+ActorTCPdatas::~ActorTCPdatas(){
+
+}
+
+int ActorTCPdatas::getId(){
+	return id;
+}
+
+sf::Packet& operator <<(sf::Packet& packet, const ActorTCPdatas& actor)
+{
+	return packet; // Empty.
+}
+
+sf::Packet& operator >>(sf::Packet& packet, ActorTCPdatas& actor)
+{
+	return packet >> actor.id >> actor.x >> actor.y >> actor.dir >> actor.sAttack;
+}
+
 Actor::Actor(){
 	id = 0;
 	x = 0;
@@ -9,11 +35,10 @@ Actor::Actor(){
 	lastDir = dir;
 	frameH = 0;
 	frameW = 0;
-	sAttack = false;
 	attack = false;
 	autoAttack.init(1, x, y);
 
-	texture = &textures["player"];
+	texture = &mainManager["player"];
 	sprite.setTexture(*texture);
 	textureSize = texture->getSize();
 	sprite.setTextureRect(sf::IntRect(0, 0, textureSize.x / 4, textureSize.y / 4));
@@ -24,12 +49,8 @@ Actor::~Actor(){
 
 }
 
-void Actor::init(){
-
-}
-
-void Actor::createTexture(AssetsManager &container){
-
+void Actor::init(int data){
+	id = data;
 }
 
 void Actor::update(){
@@ -54,7 +75,7 @@ void Actor::update(){
 	lastDir = dir;
 }
 
-void Actor::captureData(Actor &data){
+void Actor::captureData(ActorTCPdatas &data){
 	id = data.id;
 	x = data.x;
 	y = data.y;
@@ -77,18 +98,4 @@ void Actor::draw(sf::RenderWindow *win){
 
 void Actor::showStats(){
 	std::cout << x << ", " << y << ", " << dir << std::endl;
-}
-
-int Actor::getId(){
-	return id;
-}
-
-sf::Packet& operator <<(sf::Packet& packet, const Actor& actor)
-{
-	return packet; // Empty.
-}
-
-sf::Packet& operator >>(sf::Packet& packet, Actor& actor)
-{
-	return packet >> actor.id >> actor.x >> actor.y >> actor.dir >> actor.sAttack;
 }

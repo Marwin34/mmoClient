@@ -30,12 +30,5 @@ sf::Texture& AssetsManager::operator[](std::string data){
 	else return textures["none"];
 }
 
-std::map <std::string, sf::Texture> textures;
-
-void load(){
-	textures["none"].loadFromFile("img/none.png");
-	textures["player"].loadFromFile("./img/player.png");
-	textures["player"].setSmooth(true);
-	textures["meleAttack"].loadFromFile("./img/attackAnims2.png");
-	textures["meleAttack"].setSmooth(true);
-}
+//GLOBAL MAANGER 
+AssetsManager mainManager;
