@@ -19,5 +19,6 @@ public:
 	sf::Texture& operator[](std::string);
 };
 
-//PUBLICZNA GLOBALNA
-extern AssetsManager mainManager;
+extern std::map <std::string, sf::Texture> textures;
+
+void load();

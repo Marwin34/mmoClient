@@ -13,9 +13,9 @@ Client::Client() : r_thread(&Client::receive, this) {
 	test.init(0);
 	wsadIndex = 4;
 
-	mouseButtonIndex = 0;
+	load();
 
-	mainManager.load();
+	mouseButtonIndex = 0;
 }
 
 Client::~Client(){
@@ -98,7 +98,7 @@ void Client::receive(){
 						std::cout << myId << std::endl;
 					}
 					if (type == "DATAS"){ // If packet contains player states render them.
-						std::vector<ActorTCPData> buffor; // Create buffor for incoming datas.
+						std::vector<Actor> buffor; // Create buffor for incoming datas.
 						buffor.resize(0);
 						unsigned size = 0;
 						packet >> size;
@@ -124,7 +124,7 @@ void Client::send(){
 	socket.send(packet);
 }
 
-void Client::transferFromBuffor(std::vector<ActorTCPData> &buffor){
+void Client::transferFromBuffor(std::vector<Actor> &buffor){
 	if (actors.size() > buffor.size()){
 		// Now we delete objects which server didnt send.
 		for (unsigned i = 0; i < actors.size(); i++){
@@ -142,10 +142,7 @@ void Client::transferFromBuffor(std::vector<ActorTCPData> &buffor){
 			for (unsigned i = 0; i < actors.size(); i++){
 				if (buffor[j].getId() == actors[i].getId()) exist = true;
 			}
-			if (!exist) {
-				Actor tmp;
-				actors.push_back(tmp);
-			}
+			if (!exist) actors.push_back(buffor[j]);
 		}
 	}
 	// Just copy data from buffor to actros.
@@ -153,6 +150,7 @@ void Client::transferFromBuffor(std::vector<ActorTCPData> &buffor){
 		for (unsigned j = 0; j < buffor.size(); j++){
 			if (actors[i].getId() == buffor[j].getId()){
 				actors[i].captureData(buffor[j]);
+				//actors[i].createTexture(manager);
 			}
 		}
 	}

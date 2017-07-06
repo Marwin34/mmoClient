@@ -1,47 +1,23 @@
 #include "actor.h"
 
-ActorTCPData::ActorTCPData(){
+Actor::Actor(){
 	id = 0;
 	x = 0;
 	y = 0;
-	dir = 4;
-	sAttack = false;
-}
-
-ActorTCPData::~ActorTCPData(){
-
-}
-
-int ActorTCPData::getId(){
-	return id;
-}
-
-
-sf::Packet& operator <<(sf::Packet& packet, const ActorTCPData& actor)
-{
-	return packet; // Empty.
-}
-
-sf::Packet& operator >>(sf::Packet& packet, ActorTCPData& actor)
-{
-	return packet >> actor.id >> actor.x >> actor.y >> actor.dir >> actor.sAttack;
-}
-
-Actor::Actor(){ 
 	sprite.setPosition(0, 0);
-	lastDir = 4;
+	dir = 4;
+	lastDir = dir;
 	frameH = 0;
 	frameW = 0;
+	sAttack = false;
 	attack = false;
 	autoAttack.init(1, x, y);
 
-	std::cout << texture << std::endl;
-	texture = &mainManager["player"];
+	texture = &textures["player"];
 	sprite.setTexture(*texture);
 	textureSize = texture->getSize();
 	sprite.setTextureRect(sf::IntRect(0, 0, textureSize.x / 4, textureSize.y / 4));
 	sprite.setOrigin((float)0, (float)(textureSize.y / 4 - 32));
-	//dddstd::cout << texture << std::endl;
 }
 
 Actor::~Actor(){
@@ -49,6 +25,10 @@ Actor::~Actor(){
 }
 
 void Actor::init(){
+
+}
+
+void Actor::createTexture(AssetsManager &container){
 
 }
 
@@ -74,7 +54,7 @@ void Actor::update(){
 	lastDir = dir;
 }
 
-void Actor::captureData(ActorTCPData &data){
+void Actor::captureData(Actor &data){
 	id = data.id;
 	x = data.x;
 	y = data.y;
@@ -99,3 +79,16 @@ void Actor::showStats(){
 	std::cout << x << ", " << y << ", " << dir << std::endl;
 }
 
+int Actor::getId(){
+	return id;
+}
+
+sf::Packet& operator <<(sf::Packet& packet, const Actor& actor)
+{
+	return packet; // Empty.
+}
+
+sf::Packet& operator >>(sf::Packet& packet, Actor& actor)
+{
+	return packet >> actor.id >> actor.x >> actor.y >> actor.dir >> actor.sAttack;
+}

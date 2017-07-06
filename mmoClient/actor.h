@@ -6,24 +6,14 @@
 
 #include "anims.h"
 
-class ActorTCPData{
-public:
+class Actor{
 	float x, y; // Position on server side.
 	int id;
-	bool sAttack;
+	int lastCharId;
 	int dir; // Direction received from server, only for animation etc.
-
-	friend sf::Packet& operator <<(sf::Packet&, const ActorTCPData&); // Send operator, not used right now.
-	friend sf::Packet& operator >>(sf::Packet&, ActorTCPData&); // Receive operator.
-
-	ActorTCPData();
-	~ActorTCPData();
-	int getId();
-};
-
-class Actor :public ActorTCPData{
 	int lastDir;
 	int frameW, frameH; // Vertical and horizontal frames indicators.
+	bool sAttack;
 	bool attack;
 
 	sf::Texture *texture;
@@ -32,12 +22,17 @@ class Actor :public ActorTCPData{
 	sf::Vector2u textureSize;
 
 	Animation autoAttack;
+
+	friend sf::Packet& operator <<(sf::Packet&, const Actor&); // Send operator, not used right now.
+	friend sf::Packet& operator >>(sf::Packet&, Actor&); // Receive operator.
 public:
 	Actor();
 	~Actor();
 	void init();
+	void createTexture(AssetsManager&);
 	void update();
-	void captureData(ActorTCPData&);
+	void captureData(Actor&);
 	void draw(sf::RenderWindow*);
 	void showStats();
+	int getId();
 };

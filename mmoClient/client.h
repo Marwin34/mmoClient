@@ -36,7 +36,6 @@ public:
 	void draw(); // Drawing window and dispaying it.
 	void receive(); // Receiving messages.
 	void send(); // Sending messages.
-	void transferFromBuffor(std::vector<ActorTCPData>&);
+	void transferFromBuffor(std::vector<Actor>&);
 	bool connect(); // Connecting to the server.
 };
-
