@@ -27,7 +27,7 @@ bool Map::loadFromFile(std::string path){
 
 	if (!image.loadFromFile("./img/maps/" + path + ".png")) return false; // Check if image of the map was loaded.
 
-	std::fstream file("./resources/" + path+".txt", std::ios::in); // Check if .txt file was opened.
+	std::fstream file("./resources/" + path + ".txt", std::ios::in); // Check if .txt file was opened.
 	if (!file) return false;
 
 	// Set texture and load coliders.

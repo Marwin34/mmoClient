@@ -38,12 +38,11 @@ Actor::Actor(){
 	attack = false;
 	autoAttack.init(1, x, y);
 
-	texture = &mainManager["test"];
+	texture = &mainManager["player"];
 	sprite.setTexture(*texture);
 	textureSize = texture->getSize();
-	sprite.setTextureRect(sf::IntRect(0, 0, 32, 32));
-	sprite.setOrigin((float)0, (float)(0));
-	//prite.setScale(2,2);
+	sprite.setTextureRect(sf::IntRect(0, 0, textureSize.x / 5, textureSize.y / 4));
+	sprite.setOrigin((float)0, (float)(textureSize.y / 4 - 32));
 }
 
 Actor::~Actor(){
@@ -55,7 +54,7 @@ void Actor::init(int data){
 }
 
 void Actor::update(){
-	autoAttack.update(x, y, frameW);
+	autoAttack.update(x, y, frameH);
 
 	if (attack) {
 		attack = false;
@@ -63,17 +62,17 @@ void Actor::update(){
 	}
 
 	if (lastDir == dir){
-		frameH++;
+		frameW++;
 	}
-	if (dir == 4 || frameH >= 16) frameH = 0;
+	if (dir == 4 || frameW >= 16) frameW = 0;
 
 	if (!autoAttack.active()){
-		if (dir == 0) frameW = 3;
-		if (dir == 1) frameW = 2;
-		if (dir == 2) frameW = 0;
-		if (dir == 3) frameW = 1;
+		if (dir == 0) frameH = 3;
+		if (dir == 1) frameH = 2;
+		if (dir == 2) frameH = 0;
+		if (dir == 3) frameH = 1;
 	}
-	else frameH = 17;
+	else frameW = 17; // It points on last frame of animation.
 	//std::cout << " update : " << attack << std::endl;
 	lastDir = dir;
 }
@@ -87,9 +86,9 @@ void Actor::captureData(ActorTCPdatas &data){
 }
 
 void Actor::draw(sf::RenderWindow *win){
-	sprite.setTextureRect(sf::IntRect(frameH / 4 * textureSize.x / 5, frameW * textureSize.y / 4, textureSize.x / 5, textureSize.y / 4));
+	sprite.setTextureRect(sf::IntRect(frameW / 4 * textureSize.x / 5, frameH * textureSize.y / 4, textureSize.x / 5, textureSize.y / 4));
 	sprite.setPosition(x, y);
-	if (frameW != 3) {
+	if (frameH != 3) {
 		win->draw(sprite);
 		autoAttack.draw(win);
 	}

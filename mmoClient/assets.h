@@ -8,6 +8,11 @@
 
 #pragma once
 
+/*
+	Class made in order to load assets from files.
+	Include global container.
+*/
+
 class AssetsManager{
 	std::map <std::string, sf::Texture> textures;
 	sf::Font mainFont;
@@ -19,4 +24,4 @@ public:
 	sf::Texture& operator[](std::string);
 };
 
-extern AssetsManager mainManager;
+extern AssetsManager mainManager; // Global container.

@@ -8,6 +8,7 @@ Animation::Animation(){
 	type = 0;
 	id = 0;
 	timer = 0;
+	lenght = 1;
 	frameH = 2;
 	frameW = 0;
 }
@@ -23,9 +24,31 @@ void Animation::init(int sId, float sx, float sy){
 		y = sy;
 		type = 1; // Mele type.
 		id = 1; // ID.
-		image.loadFromFile("./img/sword_layer.png");
-		texture.loadFromImage(image);
-		sprite.setPosition(x, y);
+		lenght = 3; 
+
+		topOffset.x = 22;
+		topOffset.y = 0;
+		rightOffset.x = 32;
+		rightOffset.y = 22;
+		downOffset.x = 10;
+		downOffset.y = 32;
+		leftOffset.x = 0;
+		leftOffset.y = 22;
+
+		topOrigin.x = 6;
+		topOrigin.y = 12;
+
+		rightOrigin.x = 0;
+		rightOrigin.y = 6;
+
+		bottomOrigin.x = 6;
+		bottomOrigin.y = 0;
+
+		leftOrigin.x = 12;
+		leftOrigin.y = 6;
+
+		texture = &mainManager["swordAttack"];
+		sprite.setTexture(*texture);
 	}
 }
 
@@ -33,47 +56,42 @@ void Animation::start(){
 	timer = 1;
 }
 
-void Animation::update(float xx, float yy, int actorFrameW){
+void Animation::update(float xx, float yy, int actorFrameH){
 	x = xx;
 	y = yy;
-	if (actorFrameW == 3 && !timer){
-		//sprite.setTextureRect(sf::IntRect(0, 0, 30, 30));
-		frameW = 3;
-		sprite.setOrigin(6, 12);
-		offsetX = 22;
-		offsetY = 0;
+	if (actorFrameH == 3 && !timer){
+		frameH = 3;
+		sprite.setOrigin(topOrigin.x, topOrigin.y);
+		offsetX = topOffset.x;
+		offsetY = topOffset.y;
 	}
-	if (actorFrameW == 2 && !timer){
-		//sprite.setTextureRect(sf::IntRect(0, 30, 30, 30));
-		frameW = 2;
-		sprite.setOrigin(0, 6);
-		offsetX = 32;
-		offsetY = 22;
+	if (actorFrameH == 2 && !timer){
+		frameH = 2;
+		sprite.setOrigin(rightOrigin.x, rightOrigin.y);
+		offsetX = rightOffset.x;
+		offsetY = rightOffset.y;
 	}
-	if (actorFrameW == 0 && !timer){
-		//sprite.setTextureRect(sf::IntRect(0, 60, 30, 30));
-		frameW = 0;
-		sprite.setOrigin(6, 0);
-		offsetX = 10;
-		offsetY = 32;
+	if (actorFrameH == 0 && !timer){
+		frameH = 0;
+		sprite.setOrigin(bottomOrigin.x, bottomOrigin.y);
+		offsetX = downOffset.x;
+		offsetY = downOffset.y;
 	}
-	if (actorFrameW == 1 && !timer){
-		//sprite.setTextureRect(sf::IntRect(0, 90, 30, 30));
-		frameW = 1;
-		sprite.setOrigin(12, 6);
-		offsetX = 0;
-		offsetY = 22;
+	if (actorFrameH == 1 && !timer){
+		frameH = 1;
+		sprite.setOrigin(leftOrigin.x, leftOrigin.y);
+		offsetX = leftOffset.x;
+		offsetY = leftOffset.y;
 	}
 
 	if (timer){
 		timer++;
-		if (timer > 5){
+		if (timer >= lenght){
 			timer = 0; // 5 == 5 * 20 milisecons == 100 miliseconds
 		}
 	}
 	//std::cout << frameH << std::endl;
-	sprite.setTextureRect(sf::IntRect(0, frameW * image.getSize().y / 4, image.getSize().x, image.getSize().y / 4));
-	sprite.setTexture(texture);
+	sprite.setTextureRect(sf::IntRect(frameW * texture->getSize().x, frameH * texture->getSize().y / 4, texture->getSize().x, texture->getSize().y / 4)); // 4 - number of elements in collumn (animation file).
 	sprite.setPosition(x + offsetX, y + offsetY);
 }
 
