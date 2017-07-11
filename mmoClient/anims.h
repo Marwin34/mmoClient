@@ -24,4 +24,5 @@ public:
 	void start();
 	void update(float, float, int);
 	void draw(sf::RenderWindow*);
+	bool active();
 };

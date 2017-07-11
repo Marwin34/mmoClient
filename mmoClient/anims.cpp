@@ -84,3 +84,8 @@ void Animation::draw(sf::RenderWindow *win){
 	
 	if(timer) win->draw(sprite);
 }
+
+bool Animation::active(){
+	if (timer > 0) return true;
+	return false;
+}

@@ -38,11 +38,12 @@ Actor::Actor(){
 	attack = false;
 	autoAttack.init(1, x, y);
 
-	texture = &mainManager["player"];
+	texture = &mainManager["test"];
 	sprite.setTexture(*texture);
 	textureSize = texture->getSize();
-	sprite.setTextureRect(sf::IntRect(0, 0, textureSize.x / 4, textureSize.y / 4));
-	sprite.setOrigin((float)0, (float)(textureSize.y / 4 - 32));
+	sprite.setTextureRect(sf::IntRect(0, 0, 32, 32));
+	sprite.setOrigin((float)0, (float)(0));
+	//prite.setScale(2,2);
 }
 
 Actor::~Actor(){
@@ -54,24 +55,25 @@ void Actor::init(int data){
 }
 
 void Actor::update(){
+	autoAttack.update(x, y, frameW);
+
+	if (attack) {
+		attack = false;
+		autoAttack.start();
+	}
+
 	if (lastDir == dir){
 		frameH++;
 	}
 	if (dir == 4 || frameH >= 16) frameH = 0;
 
-	if (dir == 0) frameW = 3;
-	if (dir == 1) frameW = 2;
-	if (dir == 2) frameW = 0;
-	if (dir == 3) frameW = 1;
-
-	autoAttack.update(x, y, frameW);
-	//std::cout << " update : " << attack << std::endl;
-	if (attack) {
-		attack = false;
-		autoAttack.start();
-		frameH = 12;
+	if (!autoAttack.active()){
+		if (dir == 0) frameW = 3;
+		if (dir == 1) frameW = 2;
+		if (dir == 2) frameW = 0;
+		if (dir == 3) frameW = 1;
 	}
-	
+	//std::cout << " update : " << attack << std::endl;
 	lastDir = dir;
 }
 
@@ -84,7 +86,7 @@ void Actor::captureData(ActorTCPdatas &data){
 }
 
 void Actor::draw(sf::RenderWindow *win){
-	sprite.setTextureRect(sf::IntRect(frameH / 4 * textureSize.x / 4, frameW * textureSize.y / 4, textureSize.x / 4, textureSize.y / 4));
+	sprite.setTextureRect(sf::IntRect(frameH / 4 * textureSize.x / 5, frameW * textureSize.y / 4, textureSize.x / 5, textureSize.y / 4));
 	sprite.setPosition(x, y);
 	if (frameW != 3) {
 		win->draw(sprite);

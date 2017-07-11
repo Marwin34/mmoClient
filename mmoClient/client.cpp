@@ -47,6 +47,7 @@ void Client::run(){
 			if (event.type == sf::Event::LostFocus) focused = 0; // Loseing focus.
 			if (event.type == sf::Event::GainedFocus) focused = 1; // Gaining focus.
 			if (focused) {
+				if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape)) window.close();
 				wsadIndex = 4;
 				if (sf::Keyboard::isKeyPressed(sf::Keyboard::W)) wsadIndex = 0;
 				if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)) wsadIndex = 1;
