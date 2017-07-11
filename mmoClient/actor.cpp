@@ -73,6 +73,7 @@ void Actor::update(){
 		if (dir == 2) frameW = 0;
 		if (dir == 3) frameW = 1;
 	}
+	else frameH = 17;
 	//std::cout << " update : " << attack << std::endl;
 	lastDir = dir;
 }

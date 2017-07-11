@@ -9,13 +9,15 @@ AssetsManager::~AssetsManager(){
 }
 
 void AssetsManager::load(){
-	textures["none"].loadFromFile("img/none.png");
+	textures["none"].loadFromFile("./img/none.png");
 	textures["player"].loadFromFile("./img/player.png");
 	textures["player"].setSmooth(true);
-	textures["test"].loadFromFile("img/charset_template_combat2.png");
+	textures["test"].loadFromFile("./img/charset_template_combat2.png");
 	textures["test"].setSmooth(true);
 	textures["meleAttack"].loadFromFile("./img/attackAnims2.png");
 	textures["meleAttack"].setSmooth(true);
+	textures["meleAttack2"].loadFromFile("./img/sword_layer.png");
+	textures["meleAttack2"].setSmooth(true);
 
 	//CZIONKI
 	mainFont.loadFromFile("font/Anonymous_Pro.ttf");
