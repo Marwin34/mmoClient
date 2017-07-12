@@ -5,6 +5,8 @@ ActorTCPdatas::ActorTCPdatas(){
 	x = 0;
 	y = 0;
 	dir = 4;
+	maxHp = 0;
+	currHp = maxHp;
 	sAttack = false;
 }
 
@@ -23,7 +25,7 @@ sf::Packet& operator <<(sf::Packet& packet, const ActorTCPdatas& actor)
 
 sf::Packet& operator >>(sf::Packet& packet, ActorTCPdatas& actor)
 {
-	return packet >> actor.id >> actor.x >> actor.y >> actor.dir >> actor.sAttack;
+	return packet >> actor.id >> actor.x >> actor.y >> actor.dir >> actor.sAttack >> actor.currHp >> actor.maxHp;
 }
 
 Actor::Actor(){
@@ -38,11 +40,12 @@ Actor::Actor(){
 	attack = false;
 	autoAttack.init(1, x, y);
 
-	texture = &mainManager["player"];
-	sprite.setTexture(*texture);
-	textureSize = texture->getSize();
+	sprite.setTexture(*mainManager["player"]);
+	textureSize = mainManager["player"]->getSize();
 	sprite.setTextureRect(sf::IntRect(0, 0, textureSize.x / 5, textureSize.y / 4));
 	sprite.setOrigin((float)0, (float)(textureSize.y / 4 - 32));
+
+	hpIndiactor.setTexture(*mainManager["hpIndicator"]);
 }
 
 Actor::~Actor(){
@@ -75,6 +78,7 @@ void Actor::update(){
 	else frameW = 17; // It points on last frame of animation.
 	//std::cout << " update : " << attack << std::endl;
 	lastDir = dir;
+	hpIndiactor.setScale(float(maxHp) / float(currHp), 1);
 }
 
 void Actor::captureData(ActorTCPdatas &data){
@@ -82,6 +86,8 @@ void Actor::captureData(ActorTCPdatas &data){
 	x = data.x;
 	y = data.y;
 	dir = data.dir;
+	maxHp = data.maxHp;
+	currHp = data.currHp;
 	if (data.sAttack) attack = data.sAttack;
 }
 
@@ -96,6 +102,9 @@ void Actor::draw(sf::RenderWindow *win){
 		autoAttack.draw(win);
 		win->draw(sprite);
 	}
+
+	hpIndiactor.setPosition(x - 4, y - 15);
+	win->draw(hpIndiactor);
 }
 
 void Actor::showStats(){

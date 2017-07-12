@@ -20,12 +20,13 @@ class Animation {
 	sf::Vector2f downOffset;
 	sf::Vector2f leftOffset;
 
-	sf::Vector2i topOrigin; // Set the origin of sprite.
-	sf::Vector2i rightOrigin;
-	sf::Vector2i bottomOrigin;
-	sf::Vector2i leftOrigin;
+	sf::Vector2f topOrigin; // Set the origin of sprite.
+	sf::Vector2f rightOrigin;
+	sf::Vector2f bottomOrigin;
+	sf::Vector2f leftOrigin;
 
-	sf::Texture *texture;
+	sf::Vector2u textureSize;
+
 	sf::Sprite sprite;
 public:
 	Animation();

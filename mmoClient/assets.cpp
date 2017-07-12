@@ -14,6 +14,8 @@ void AssetsManager::load(){
 	textures["player"].setSmooth(true);
 	textures["swordAttack"].loadFromFile("./img/sword_layer.png");
 	textures["swordAttack"].setSmooth(true);
+	textures["hpIndicator"].loadFromFile("./img/hp.png");
+	textures["hpIndicator"].setSmooth(true);
 
 	//CZIONKI
 	mainFont.loadFromFile("font/Anonymous_Pro.ttf");
@@ -23,11 +25,11 @@ sf::Font* AssetsManager::font(){
 	return &mainFont;
 }
 
-sf::Texture& AssetsManager::operator[](std::string data){
+sf::Texture* AssetsManager::operator[](std::string data){
 	if (textures.count(data) > 0){
-		return textures[data];
+		return &textures[data];
 	}
-	else return textures["none"];
+	else return &textures["none"];
 }
 
 //GLOBAL MAANGER 

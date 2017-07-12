@@ -11,6 +11,8 @@ public:
 	float x, y; // Position on server side.
 	int id;
 	int dir; // Direction received from server, only for animation etc.
+	int currHp;
+	int maxHp;
 	bool sAttack;
 
 	ActorTCPdatas();
@@ -27,8 +29,8 @@ class Actor :public ActorTCPdatas {
 	int frameW, frameH; // Vertical and horizontal frames indicators.
 	bool attack;
 
-	sf::Texture *texture;
 	sf::Sprite sprite;
+	sf::Sprite hpIndiactor;
 
 	sf::Vector2u textureSize;
 

@@ -24,7 +24,7 @@ void Animation::init(int sId, float sx, float sy){
 		y = sy;
 		type = 1; // Mele type.
 		id = 1; // ID.
-		lenght = 3; 
+		lenght = 5; 
 
 		topOffset.x = 22;
 		topOffset.y = 0;
@@ -47,8 +47,8 @@ void Animation::init(int sId, float sx, float sy){
 		leftOrigin.x = 12;
 		leftOrigin.y = 6;
 
-		texture = &mainManager["swordAttack"];
-		sprite.setTexture(*texture);
+		sprite.setTexture(*mainManager["swordAttack"]);
+		textureSize = mainManager["swordAttack"]->getSize();
 	}
 }
 
@@ -91,7 +91,7 @@ void Animation::update(float xx, float yy, int actorFrameH){
 		}
 	}
 	//std::cout << frameH << std::endl;
-	sprite.setTextureRect(sf::IntRect(frameW * texture->getSize().x, frameH * texture->getSize().y / 4, texture->getSize().x, texture->getSize().y / 4)); // 4 - number of elements in collumn (animation file).
+	sprite.setTextureRect(sf::IntRect(frameW * textureSize.x, frameH * textureSize.y / 4, textureSize.x, textureSize.y / 4)); // 4 - number of elements in collumn (animation file).
 	sprite.setPosition(x + offsetX, y + offsetY);
 }
 

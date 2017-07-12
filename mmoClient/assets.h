@@ -21,7 +21,7 @@ public:
 	~AssetsManager();
 	void load();
 	sf::Font* font();
-	sf::Texture& operator[](std::string);
+	sf::Texture* operator[](std::string);
 };
 
 extern AssetsManager mainManager; // Global container.
