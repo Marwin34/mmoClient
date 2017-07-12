@@ -77,7 +77,7 @@ void Actor::update(){
 	}
 	else frameW = 17; // It points on last frame of animation.
 	//std::cout << " update : " << attack << std::endl;
-	lastDir = dir;
+	lastDir = dir; 
 	hpIndiactor.setScale(float(maxHp) / float(currHp), 1);
 }
 
