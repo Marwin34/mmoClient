@@ -5,6 +5,8 @@
 
 #include "assets.h"
 
+#pragma once
+
 class Animation {
 	int type;
 	int id;

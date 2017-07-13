@@ -12,6 +12,8 @@ void AssetsManager::load(){
 	textures["none"].loadFromFile("./img/none.png");;
 	textures["player"].loadFromFile("./img/charset_template_combat2.png");
 	textures["player"].setSmooth(true);
+	textures["enemy"].loadFromFile("./img/enemy.png");
+	textures["enemy"].setSmooth(true);
 	textures["swordAttack"].loadFromFile("./img/sword_layer.png");
 	textures["swordAttack"].setSmooth(true);
 	textures["hpIndicator"].loadFromFile("./img/hp.png");

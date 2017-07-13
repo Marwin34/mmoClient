@@ -88,6 +88,7 @@
     <ClCompile Include="anims.cpp" />
     <ClCompile Include="assets.cpp" />
     <ClCompile Include="client.cpp" />
+    <ClCompile Include="enemy.cpp" />
     <ClCompile Include="level.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
@@ -96,6 +97,7 @@
     <ClInclude Include="anims.h" />
     <ClInclude Include="assets.h" />
     <ClInclude Include="client.h" />
+    <ClInclude Include="enemy.h" />
     <ClInclude Include="level.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

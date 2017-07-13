@@ -60,6 +60,9 @@ void Client::run(){
 
 		mainTimer = mainClock.getElapsedTime(); // Get the main time;
 		if (mainTimer.asMilliseconds() - lastUpdate.asMilliseconds() >= 20){ // Update scene and send data only every 50 milliseconds;
+			for (unsigned i = 0; i < enemies.size(); i++){
+				enemies[i].update();
+			}
 			for (unsigned i = 0; i < actors.size(); i++){
 				actors[i].update(); // Update players (pos, render state etc)
 				//actors[i].showStats(); // Just for checking player stats.
@@ -74,6 +77,9 @@ void Client::run(){
 void Client::draw(){
 	window.clear(sf::Color::Green); // Clear the window and set green color for backgroud.
 	test.draw(&window);
+	for (unsigned i = 0; i < enemies.size(); i++){
+		enemies[i].draw(&window); // Draw all actors.
+	}
 	for (unsigned i = 0; i < actors.size(); i++){
 		actors[i].draw(&window); // Draw all actors.
 	}
@@ -100,14 +106,21 @@ void Client::receive(){
 					}
 					if (type == "DATAS"){ // If packet contains player states render them.
 						std::vector<ActorTCPdatas> buffor; // Create buffor for incoming datas.
+						std::vector<EnemyTCPdatas> buffor2; // Create buffor for incoming datas.
 						buffor.resize(0);
+						buffor2.resize(0);
 						unsigned size = 0;
 						packet >> size;
 						buffor.resize(size);
 						for (unsigned i = 0; i < size; i++){
 							packet >> buffor[i];
 						}
-						transferFromBuffor(buffor); // Copy datas from buffor to actors vector.
+						packet >> size;
+						buffor2.resize(size);
+						for (unsigned i = 0; i < size; i++){
+							packet >> buffor2[i];
+						}
+						transferFromBuffors(buffor, buffor2); // Copy datas from buffor to actors vector.
 					}
 				}
 				if (status == sf::Socket::Disconnected)
@@ -125,36 +138,69 @@ void Client::send(){
 	socket.send(packet);
 }
 
-void Client::transferFromBuffor(std::vector<ActorTCPdatas> &buffor){
-	if (actors.size() > buffor.size()){
+void Client::transferFromBuffors(std::vector<ActorTCPdatas> &buffor1, std::vector<EnemyTCPdatas> &buffor2){
+	if (actors.size() > buffor1.size()){
 		// Now we delete objects which server didnt send.
 		for (unsigned i = 0; i < actors.size(); i++){
 			bool exist = false;
-			for (unsigned j = 0; j < buffor.size(); j++){
-				if (actors[i].getId() == buffor[j].getId()) exist = true;
+			for (unsigned j = 0; j < buffor1.size(); j++){
+				if (actors[i].getId() == buffor1[j].getId()) exist = true;
 			}
 			if (!exist) actors.erase(actors.begin() + i);
 		}
 	}
-	else if (actors.size() < buffor.size()){
+	else if (actors.size() < buffor1.size()){
 		// Find objects to add and add them.
-		for (unsigned j = 0; j < buffor.size(); j++){
+		for (unsigned j = 0; j < buffor1.size(); j++){
 			bool exist = false;
 			for (unsigned i = 0; i < actors.size(); i++){
-				if (buffor[j].getId() == actors[i].getId()) exist = true;
+				if (buffor1[j].getId() == actors[i].getId()) exist = true;
 			}
 			if (!exist){
 				Actor tmp;
-				tmp.init(buffor[j].getId());
+				tmp.init(buffor1[j].getId());
 				actors.push_back(tmp);
 			}
 		}
 	}
 	// Just copy data from buffor to actros.
 	for (unsigned i = 0; i < actors.size(); i++){
-		for (unsigned j = 0; j < buffor.size(); j++){
-			if (actors[i].getId() == buffor[j].getId()){
-				actors[i].captureData(buffor[j]);
+		for (unsigned j = 0; j < buffor1.size(); j++){
+			if (actors[i].getId() == buffor1[j].getId()){
+				actors[i].captureData(buffor1[j]);
+			}
+		}
+	}
+
+	if (enemies.size() > buffor2.size()){
+		// Now we delete objects which server didnt send.
+		for (unsigned i = 0; i < enemies.size(); i++){
+			bool exist = false;
+			for (unsigned j = 0; j < buffor2.size(); j++){
+				if (enemies[i].getId() == buffor2[j].getId()) exist = true;
+			}
+			if (!exist) enemies.erase(enemies.begin() + i);
+		}
+	}
+	else if (enemies.size() < buffor2.size()){
+		// Find objects to add and add them.
+		for (unsigned j = 0; j < buffor2.size(); j++){
+			bool exist = false;
+			for (unsigned i = 0; i < enemies.size(); i++){
+				if (buffor2[j].getId() == enemies[i].getId()) exist = true;
+			}
+			if (!exist){
+				Enemy tmp;
+				tmp.init(buffor2[j].getId());
+				enemies.push_back(tmp);
+			}
+		}
+	}
+	// Just copy data from buffor to actros.
+	for (unsigned i = 0; i < enemies.size(); i++){
+		for (unsigned j = 0; j < buffor2.size(); j++){
+			if (enemies[i].getId() == buffor2[j].getId()){
+				enemies[i].captureData(buffor2[j]);
 			}
 		}
 	}

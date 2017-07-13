@@ -6,6 +6,7 @@
 #include "actor.h"
 #include "level.h"
 #include "assets.h"
+#include "enemy.h"
 
 class Client{
 	sf::RenderWindow window; // Create a window.
@@ -17,6 +18,7 @@ class Client{
 	sf::Time drawUpdate;
 
 	std::vector<Actor> actors;
+	std::vector<Enemy> enemies;
 	//Actor *me;
 
 	int myId; // Id of client charakters.
@@ -36,6 +38,6 @@ public:
 	void draw(); // Drawing window and dispaying it.
 	void receive(); // Receiving messages.
 	void send(); // Sending messages.
-	void transferFromBuffor(std::vector<ActorTCPdatas>&);
+	void transferFromBuffors(std::vector<ActorTCPdatas>&, std::vector<EnemyTCPdatas>&);
 	bool connect(); // Connecting to the server.
 };

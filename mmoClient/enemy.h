@@ -6,24 +6,22 @@
 
 #include "anims.h"
 
-class ActorTCPdatas{ // Its a class only for receiving datas from server.
+class EnemyTCPdatas{ // Its a class only for receiving datas from server.
 public:
 	float x, y; // Position on server side.
 	int id;
-	int dir; // Direction received from server, only for animation etc.
 	int currHp;
 	int maxHp;
 	bool sAttack;
 
-	ActorTCPdatas();
-	~ActorTCPdatas();
+	EnemyTCPdatas();
+	~EnemyTCPdatas();
 	int getId();
 
-	friend sf::Packet& operator <<(sf::Packet&, const ActorTCPdatas&); // Send operator, not used right now.
-	friend sf::Packet& operator >>(sf::Packet&, ActorTCPdatas&); // Receive operator.
+	friend sf::Packet& operator >>(sf::Packet&, EnemyTCPdatas&); // Receive operator.
 };
 
-class Actor :public ActorTCPdatas {
+class Enemy :public EnemyTCPdatas {
 	int lastCharId;
 	int lastDir;
 	int frameW, frameH; // Vertical and horizontal frames indicators.
@@ -37,11 +35,11 @@ class Actor :public ActorTCPdatas {
 	Animation autoAttack;
 
 public:
-	Actor();
-	~Actor();
+	Enemy();
+	~Enemy();
 	void init(int);
 	void update();
-	void captureData(ActorTCPdatas&);
+	void captureData(EnemyTCPdatas&);
 	void draw(sf::RenderWindow*);
 	void showStats();
 };
