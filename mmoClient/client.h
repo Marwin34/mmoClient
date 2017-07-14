@@ -6,7 +6,7 @@
 #include "actor.h"
 #include "level.h"
 #include "assets.h"
-#include "enemy.h"
+//#include "enemy.h"
 
 class Client{
 	sf::RenderWindow window; // Create a window.
@@ -17,7 +17,7 @@ class Client{
 	sf::Time lastUpdate; // Time of the last update of the client.
 	sf::Time drawUpdate;
 
-	std::vector<Actor> actors;
+	std::vector<Player> players;
 	std::vector<Enemy> enemies;
 	//Actor *me;
 
@@ -25,6 +25,8 @@ class Client{
 	int wsadIndex; // Index of WSAD button that is pressed.
 
 	unsigned int mouseButtonIndex; // Index of mouse button which is pressed.
+	unsigned int rPlayersSize; // Quantity of players send by server.
+	unsigned int rEnemiesSize; // Quantity of enemies send by server.
 
 	bool focused; // Determine if window have focus.
 
@@ -38,6 +40,6 @@ public:
 	void draw(); // Drawing window and dispaying it.
 	void receive(); // Receiving messages.
 	void send(); // Sending messages.
-	void transferFromBuffors(std::vector<ActorTCPdatas>&, std::vector<EnemyTCPdatas>&);
+	void transferFromBuffor(std::vector<ActorTCPdatas>&);
 	bool connect(); // Connecting to the server.
 };

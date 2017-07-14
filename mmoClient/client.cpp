@@ -7,7 +7,7 @@ Client::Client() : r_thread(&Client::receive, this) {
 	lastUpdate = sf::Time::Zero; // initialize the lastUpdate timer.
 	drawUpdate = sf::Time::Zero; // initialize the drawUpdate timer.
 	myId = 0;
-	actors.resize(0);
+	players.resize(0);
 	focused = 1;
 
 	test.init(0);
@@ -16,6 +16,9 @@ Client::Client() : r_thread(&Client::receive, this) {
 	mainManager.load();
 
 	mouseButtonIndex = 0;
+
+	rPlayersSize = 0;
+	rEnemiesSize = 0;
 }
 
 Client::~Client(){
@@ -62,9 +65,9 @@ void Client::run(){
 		if (mainTimer.asMilliseconds() - lastUpdate.asMilliseconds() >= 20){ // Update scene and send data only every 50 milliseconds;
 			for (unsigned i = 0; i < enemies.size(); i++){
 				enemies[i].update();
-			}
-			for (unsigned i = 0; i < actors.size(); i++){
-				actors[i].update(); // Update players (pos, render state etc)
+			}  
+			for (unsigned i = 0; i < players.size(); i++){
+				players[i].update(); // Update players (pos, render state etc)
 				//actors[i].showStats(); // Just for checking player stats.
 			}
 			draw();
@@ -80,8 +83,8 @@ void Client::draw(){
 	for (unsigned i = 0; i < enemies.size(); i++){
 		enemies[i].draw(&window); // Draw all actors.
 	}
-	for (unsigned i = 0; i < actors.size(); i++){
-		actors[i].draw(&window); // Draw all actors.
+	for (unsigned i = 0; i < players.size(); i++){
+		players[i].draw(&window); // Draw all actors.
 	}
 	window.display(); // Display window.
 }
@@ -106,21 +109,14 @@ void Client::receive(){
 					}
 					if (type == "DATAS"){ // If packet contains player states render them.
 						std::vector<ActorTCPdatas> buffor; // Create buffor for incoming datas.
-						std::vector<EnemyTCPdatas> buffor2; // Create buffor for incoming datas.
-						buffor.resize(0);
-						buffor2.resize(0);
-						unsigned size = 0;
-						packet >> size;
-						buffor.resize(size);
-						for (unsigned i = 0; i < size; i++){
-							packet >> buffor[i];
+						packet >> rPlayersSize >> rEnemiesSize;
+						//std::cout << rPlayersSize << " , " << rEnemiesSize << std::endl;
+						for (unsigned i = 0; i < rPlayersSize + rEnemiesSize; i++){
+							ActorTCPdatas tmp;
+							packet >> tmp;
+							buffor.push_back(tmp);
 						}
-						packet >> size;
-						buffor2.resize(size);
-						for (unsigned i = 0; i < size; i++){
-							packet >> buffor2[i];
-						}
-						transferFromBuffors(buffor, buffor2); // Copy datas from buffor to actors vector.
+						transferFromBuffor(buffor); // Copy datas from buffor to actors vector.
 					}
 				}
 				if (status == sf::Socket::Disconnected)
@@ -138,69 +134,69 @@ void Client::send(){
 	socket.send(packet);
 }
 
-void Client::transferFromBuffors(std::vector<ActorTCPdatas> &buffor1, std::vector<EnemyTCPdatas> &buffor2){
-	if (actors.size() > buffor1.size()){
+void Client::transferFromBuffor(std::vector<ActorTCPdatas> &buffor){
+	if (players.size() > rPlayersSize){
 		// Now we delete objects which server didnt send.
-		for (unsigned i = 0; i < actors.size(); i++){
+		for (unsigned i = 0; i < players.size(); i++){
 			bool exist = false;
-			for (unsigned j = 0; j < buffor1.size(); j++){
-				if (actors[i].getId() == buffor1[j].getId()) exist = true;
+			for (unsigned j = 0; j < rPlayersSize; j++){
+				if (players[i].getId() == buffor[j].getId()) exist = true;
 			}
-			if (!exist) actors.erase(actors.begin() + i);
+			if (!exist) players.erase(players.begin() + i);
 		}
 	}
-	else if (actors.size() < buffor1.size()){
+	else if (players.size() < rPlayersSize){
 		// Find objects to add and add them.
-		for (unsigned j = 0; j < buffor1.size(); j++){
+		for (unsigned j = 0; j < buffor.size(); j++){
 			bool exist = false;
-			for (unsigned i = 0; i < actors.size(); i++){
-				if (buffor1[j].getId() == actors[i].getId()) exist = true;
+			for (unsigned i = 0; i < players.size(); i++){
+				if (buffor[j].getId() == players[i].getId()) exist = true;
 			}
 			if (!exist){
-				Actor tmp;
-				tmp.init(buffor1[j].getId());
-				actors.push_back(tmp);
+				Player tmp;
+				tmp.init(buffor[j].getId());
+				players.push_back(tmp);
 			}
 		}
 	}
 	// Just copy data from buffor to actros.
-	for (unsigned i = 0; i < actors.size(); i++){
-		for (unsigned j = 0; j < buffor1.size(); j++){
-			if (actors[i].getId() == buffor1[j].getId()){
-				actors[i].captureData(buffor1[j]);
+	for (unsigned i = 0; i < players.size(); i++){
+		for (unsigned j = 0; j < rPlayersSize; j++){
+			if (players[i].getId() == buffor[j].getId()){
+				players[i].captureData(buffor[j]);
 			}
 		}
 	}
 
-	if (enemies.size() > buffor2.size()){
+	if (enemies.size() > rEnemiesSize){
 		// Now we delete objects which server didnt send.
 		for (unsigned i = 0; i < enemies.size(); i++){
 			bool exist = false;
-			for (unsigned j = 0; j < buffor2.size(); j++){
-				if (enemies[i].getId() == buffor2[j].getId()) exist = true;
+			for (unsigned j = rPlayersSize; j < rPlayersSize + rEnemiesSize; j++){
+				if (enemies[i].getId() == buffor[j].getId()) exist = true;
 			}
 			if (!exist) enemies.erase(enemies.begin() + i);
 		}
 	}
-	else if (enemies.size() < buffor2.size()){
+	else if (enemies.size() < rEnemiesSize){
 		// Find objects to add and add them.
-		for (unsigned j = 0; j < buffor2.size(); j++){
+		for (unsigned j = rPlayersSize; j < rPlayersSize + rEnemiesSize; j++){
 			bool exist = false;
 			for (unsigned i = 0; i < enemies.size(); i++){
-				if (buffor2[j].getId() == enemies[i].getId()) exist = true;
+				if (buffor[j].getId() == enemies[i].getId()) exist = true;
 			}
 			if (!exist){
 				Enemy tmp;
-				tmp.init(buffor2[j].getId());
+				tmp.init(buffor[j].getId());
 				enemies.push_back(tmp);
 			}
 		}
 	}
-	// Just copy data from buffor to actros.
+	// Just copy data from buffor to enemies.
 	for (unsigned i = 0; i < enemies.size(); i++){
-		for (unsigned j = 0; j < buffor2.size(); j++){
-			if (enemies[i].getId() == buffor2[j].getId()){
-				enemies[i].captureData(buffor2[j]);
+		for (unsigned j = rPlayersSize; j < rPlayersSize + rEnemiesSize; j++){
+			if (enemies[i].getId() == buffor[j].getId()){
+				enemies[i].captureData(buffor[j]);
 			}
 		}
 	}

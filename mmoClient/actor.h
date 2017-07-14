@@ -23,7 +23,7 @@ public:
 	friend sf::Packet& operator >>(sf::Packet&, ActorTCPdatas&); // Receive operator.
 };
 
-class Actor :public ActorTCPdatas {
+class Player :public ActorTCPdatas {
 	int lastCharId;
 	int lastDir;
 	int frameW, frameH; // Vertical and horizontal frames indicators.
@@ -37,8 +37,31 @@ class Actor :public ActorTCPdatas {
 	Animation autoAttack;
 
 public:
-	Actor();
-	~Actor();
+	Player();
+	~Player();
+	void init(int);
+	void update();
+	void captureData(ActorTCPdatas&);
+	void draw(sf::RenderWindow*);
+	void showStats();
+};
+
+class Enemy :public ActorTCPdatas {
+	int lastCharId;
+	int lastDir;
+	int frameW, frameH; // Vertical and horizontal frames indicators.
+	bool attack;
+
+	sf::Sprite sprite;
+	sf::Sprite hpIndiactor;
+
+	sf::Vector2u textureSize;
+
+	Animation autoAttack;
+
+public:
+	Enemy();
+	~Enemy();
 	void init(int);
 	void update();
 	void captureData(ActorTCPdatas&);
