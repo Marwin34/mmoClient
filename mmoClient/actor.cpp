@@ -143,7 +143,6 @@ void Enemy::init(int data){
 
 void Enemy::update(){
 	hpIndiactor.setScale(float(maxHp) / float(currHp), 1);
-	std::cout << currHp << " , " << maxHp << std::endl;
 }
 
 void Enemy::captureData(ActorTCPdatas &data){

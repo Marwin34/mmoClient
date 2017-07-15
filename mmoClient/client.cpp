@@ -135,7 +135,7 @@ void Client::send(){
 }
 
 void Client::transferFromBuffor(std::vector<ActorTCPdatas> &buffor){
-	if (players.size() > rPlayersSize){
+	/*if (players.size() > rPlayersSize){
 		// Now we delete objects which server didnt send.
 		for (unsigned i = 0; i < players.size(); i++){
 			bool exist = false;
@@ -159,15 +159,6 @@ void Client::transferFromBuffor(std::vector<ActorTCPdatas> &buffor){
 			}
 		}
 	}
-	// Just copy data from buffor to actros.
-	for (unsigned i = 0; i < players.size(); i++){
-		for (unsigned j = 0; j < rPlayersSize; j++){
-			if (players[i].getId() == buffor[j].getId()){
-				players[i].captureData(buffor[j]);
-			}
-		}
-	}
-
 	if (enemies.size() > rEnemiesSize){
 		// Now we delete objects which server didnt send.
 		for (unsigned i = 0; i < enemies.size(); i++){
@@ -192,13 +183,35 @@ void Client::transferFromBuffor(std::vector<ActorTCPdatas> &buffor){
 			}
 		}
 	}
-	// Just copy data from buffor to enemies.
-	for (unsigned i = 0; i < enemies.size(); i++){
-		for (unsigned j = rPlayersSize; j < rPlayersSize + rEnemiesSize; j++){
-			if (enemies[i].getId() == buffor[j].getId()){
-				enemies[i].captureData(buffor[j]);
+	// Just copy data from buffor to vectors of players and enemies.
+	for (unsigned i = 0; i < players.size() + enemies.size(); i++){
+		for (unsigned j = 0; j < rPlayersSize + rEnemiesSize; j++){
+			if (i < players.size()){
+				if (j >= rPlayersSize) break;
+				if (players[i].getId() == buffor[j].getId()){
+					players[i].captureData(buffor[j]);
+				}
 			}
+			else {
+				if (j < rPlayersSize) continue;
+				if (enemies[i - players.size()].getId() == buffor[j].getId()){
+					enemies[i - players.size()].captureData(buffor[j]);
+				}
+			}
+
 		}
+	}*/
+	players.resize(rPlayersSize);
+	enemies.resize(rEnemiesSize);
+
+	for (unsigned i = 0; i < rPlayersSize + rEnemiesSize; i++){
+			if (i < players.size()){
+				players[i].captureData(buffor[i]);
+
+			}
+			else {
+				enemies[i - players.size()].captureData(buffor[i]);
+			}
 	}
 }
 
