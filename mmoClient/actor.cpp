@@ -59,6 +59,13 @@ void Player::init(int data){
 }
 
 void Player::update(){
+	/*if (pos.size() > 3){
+		x = pos[0].x;
+		y = pos[0].y;
+		pos.erase(pos.begin());
+	}
+	std::cout << pos.size() << std::endl;*/
+
 	autoAttack.update(x, y, frameH);
 
 	if (attack) {
@@ -87,6 +94,10 @@ void Player::captureData(ActorTCPdatas &data){
 	id = data.id;
 	x = data.x;
 	y = data.y;
+	sf::Vector2f tmp;
+	tmp.x = data.x;
+	tmp.y = data.y;
+	pos.push_back(tmp); 
 	dir = data.dir;
 	maxHp = data.maxHp;
 	currHp = data.currHp;
@@ -94,8 +105,9 @@ void Player::captureData(ActorTCPdatas &data){
 }
 
 void Player::draw(sf::RenderWindow *win){
-	sprite.setTextureRect(sf::IntRect(frameW / 4 * textureSize.x / 5, frameH * textureSize.y / 4, textureSize.x / 5, textureSize.y / 4));
 	sprite.setPosition(x, y);
+	hpIndiactor.setPosition(x - 4, y - 15);
+	sprite.setTextureRect(sf::IntRect(frameW / 4 * textureSize.x / 5, frameH * textureSize.y / 4, textureSize.x / 5, textureSize.y / 4));
 	if (frameH != 3) {
 		win->draw(sprite);
 		autoAttack.draw(win);
@@ -104,8 +116,6 @@ void Player::draw(sf::RenderWindow *win){
 		autoAttack.draw(win);
 		win->draw(sprite);
 	}
-
-	hpIndiactor.setPosition(x - 4, y - 15);
 	win->draw(hpIndiactor);
 }
 

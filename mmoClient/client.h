@@ -15,20 +15,22 @@ class Client{
 	sf::Clock mainClock; // Creat mainClock of the client loop.
 	sf::Time mainTimer; // Create mainTimer of the client loop.
 	sf::Time lastUpdate; // Time of the last update of the client.
-	sf::Time drawUpdate;
 
 	std::vector<Player> players;
 	std::vector<Enemy> enemies;
 	//Actor *me;
 
 	int myId; // Id of client charakters.
+	int myIndex;
 	int wsadIndex; // Index of WSAD button that is pressed.
+	int clientTick;
 
 	unsigned int mouseButtonIndex; // Index of mouse button which is pressed.
 	unsigned int rPlayersSize; // Quantity of players send by server.
 	unsigned int rEnemiesSize; // Quantity of enemies send by server.
 
 	bool focused; // Determine if window have focus.
+	bool received;
 
 	Map test;
 
@@ -38,6 +40,7 @@ public:
 	~Client();
 	void run(); // 
 	void draw(); // Drawing window and dispaying it.
+	void draw2(); // Drawing window and dispaying it.
 	void receive(); // Receiving messages.
 	void send(); // Sending messages.
 	void transferFromBuffor(std::vector<ActorTCPdatas>&);

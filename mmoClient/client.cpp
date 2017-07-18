@@ -1,12 +1,12 @@
 #include "client.h"
 
-Client::Client() : r_thread(&Client::receive, this) {
+Client::Client() : r_thread(&Client::receive, this){
 	window.create(sf::VideoMode(500, 500), "SFML works!"); // Initialize the window.
 	window.setFramerateLimit(30); // Set FPS limit for the window.
 	mainTimer = sf::Time::Zero; // Initialize the mainTimer.
 	lastUpdate = sf::Time::Zero; // initialize the lastUpdate timer.
-	drawUpdate = sf::Time::Zero; // initialize the drawUpdate timer.
 	myId = 0;
+	myIndex = 0;
 	players.resize(0);
 	focused = 1;
 
@@ -19,6 +19,9 @@ Client::Client() : r_thread(&Client::receive, this) {
 
 	rPlayersSize = 0;
 	rEnemiesSize = 0;
+
+	clientTick = 0;
+	received = false;
 }
 
 Client::~Client(){
@@ -62,7 +65,9 @@ void Client::run(){
 		}
 
 		mainTimer = mainClock.getElapsedTime(); // Get the main time;
-		if (mainTimer.asMilliseconds() - lastUpdate.asMilliseconds() >= 20){ // Update scene and send data only every 50 milliseconds;
+		if (mainTimer.asMilliseconds() - lastUpdate.asMilliseconds() >= 33){ // Update scene and send data only every 50 milliseconds;
+			std::cout << "tu2" << std::endl;
+			//std::cout << mainTimer.asMilliseconds() - lastUpdate.asMilliseconds() << std::endl;
 			for (unsigned i = 0; i < enemies.size(); i++){
 				enemies[i].update();
 			}  
@@ -73,20 +78,24 @@ void Client::run(){
 			draw();
 			send(); // Send messages to the server.
 			lastUpdate = mainTimer;
+			clientTick++;
 		}
+		sf::sleep(sf::milliseconds(10));
 	}
 }
 
 void Client::draw(){
-	window.clear(sf::Color::Green); // Clear the window and set green color for backgroud.
-	test.draw(&window);
-	for (unsigned i = 0; i < enemies.size(); i++){
-		enemies[i].draw(&window); // Draw all actors.
+	if (received) {
+		window.clear(sf::Color::Green); // Clear the window and set green color for backgroud.
+		test.draw(&window);
+		for (unsigned i = 0; i < enemies.size(); i++){
+			enemies[i].draw(&window); // Draw all actors.
+		}
+		for (unsigned i = 0; i < players.size(); i++){
+			players[i].draw(&window); // Draw all actors.
+		}
+		window.display(); // Display window.
 	}
-	for (unsigned i = 0; i < players.size(); i++){
-		players[i].draw(&window); // Draw all actors.
-	}
-	window.display(); // Display window.
 }
 
 void Client::receive(){
@@ -101,11 +110,13 @@ void Client::receive(){
 				sf::Socket::Status status = socket.receive(packet); // Get status of action.
 				if (status == sf::Socket::Done) // Check status, if receiving was successfull.
 				{
+					std::cout << "tu1" << std::endl;
 					std::string type;
 					packet >> type;
 					if (type == "INIT"){ // If packet contains only id of player, set it.
-						packet >> myId;
+						packet >> myId >> clientTick;
 						std::cout << myId << std::endl;
+						received = true;
 					}
 					if (type == "DATAS"){ // If packet contains player states render them.
 						std::vector<ActorTCPdatas> buffor; // Create buffor for incoming datas.
@@ -117,6 +128,7 @@ void Client::receive(){
 							buffor.push_back(tmp);
 						}
 						transferFromBuffor(buffor); // Copy datas from buffor to actors vector.
+						received = true;
 					}
 				}
 				if (status == sf::Socket::Disconnected)
@@ -135,7 +147,7 @@ void Client::send(){
 }
 
 void Client::transferFromBuffor(std::vector<ActorTCPdatas> &buffor){
-	/*if (players.size() > rPlayersSize){
+/*	if (players.size() > rPlayersSize){
 		// Now we delete objects which server didnt send.
 		for (unsigned i = 0; i < players.size(); i++){
 			bool exist = false;
@@ -159,6 +171,7 @@ void Client::transferFromBuffor(std::vector<ActorTCPdatas> &buffor){
 			}
 		}
 	}
+
 	if (enemies.size() > rEnemiesSize){
 		// Now we delete objects which server didnt send.
 		for (unsigned i = 0; i < enemies.size(); i++){
@@ -183,7 +196,7 @@ void Client::transferFromBuffor(std::vector<ActorTCPdatas> &buffor){
 			}
 		}
 	}
-	// Just copy data from buffor to vectors of players and enemies.
+
 	for (unsigned i = 0; i < players.size() + enemies.size(); i++){
 		for (unsigned j = 0; j < rPlayersSize + rEnemiesSize; j++){
 			if (i < players.size()){
@@ -198,23 +211,22 @@ void Client::transferFromBuffor(std::vector<ActorTCPdatas> &buffor){
 					enemies[i - players.size()].captureData(buffor[j]);
 				}
 			}
-
 		}
 	}*/
 	players.resize(rPlayersSize);
 	enemies.resize(rEnemiesSize);
 
 	for (unsigned i = 0; i < rPlayersSize + rEnemiesSize; i++){
-			if (i < players.size()){
-				players[i].captureData(buffor[i]);
+		if (i < players.size()){
+			players[i].captureData(buffor[i]);
+			if (myId == players[i].getId()) myIndex = i;
 
-			}
-			else {
-				enemies[i - players.size()].captureData(buffor[i]);
-			}
+		}
+		else {
+			enemies[i - players.size()].captureData(buffor[i]);
+		}
 	}
 }
-
 bool Client::connect(){
 	sf::Socket::Status status = socket.connect("25.60.3.40", 55001); // 
 	return status == sf::Socket::Done;
