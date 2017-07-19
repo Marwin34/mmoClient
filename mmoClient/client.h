@@ -13,6 +13,7 @@ class Client{
 	sf::SocketSelector selector;  // Create selector for listening sockets (only for receiving info).
 	sf::TcpSocket socket; // Create a Socket.
 	sf::Clock mainClock; // Creat mainClock of the client loop.
+	sf::Clock receiveClock;
 	sf::Time mainTimer; // Create mainTimer of the client loop.
 	sf::Time lastUpdate; // Time of the last update of the client.
 

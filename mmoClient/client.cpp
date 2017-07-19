@@ -66,8 +66,7 @@ void Client::run(){
 
 		mainTimer = mainClock.getElapsedTime(); // Get the main time;
 		if (mainTimer.asMilliseconds() - lastUpdate.asMilliseconds() >= 33){ // Update scene and send data only every 50 milliseconds;
-			std::cout << "tu2" << std::endl;
-			//std::cout << mainTimer.asMilliseconds() - lastUpdate.asMilliseconds() << std::endl;
+			//std::cout << clientTick << std::endl;
 			for (unsigned i = 0; i < enemies.size(); i++){
 				enemies[i].update();
 			}  
@@ -80,7 +79,7 @@ void Client::run(){
 			lastUpdate = mainTimer;
 			clientTick++;
 		}
-		sf::sleep(sf::milliseconds(10));
+		sf::sleep(sf::milliseconds(5));
 	}
 }
 
@@ -110,7 +109,8 @@ void Client::receive(){
 				sf::Socket::Status status = socket.receive(packet); // Get status of action.
 				if (status == sf::Socket::Done) // Check status, if receiving was successfull.
 				{
-					std::cout << "tu1" << std::endl;
+					//std::cout << "RPS : " << 1.f / receiveClock.getElapsedTime().asSeconds() << std::endl;
+					//receiveClock.restart();
 					std::string type;
 					packet >> type;
 					if (type == "INIT"){ // If packet contains only id of player, set it.
@@ -219,8 +219,6 @@ void Client::transferFromBuffor(std::vector<ActorTCPdatas> &buffor){
 	for (unsigned i = 0; i < rPlayersSize + rEnemiesSize; i++){
 		if (i < players.size()){
 			players[i].captureData(buffor[i]);
-			if (myId == players[i].getId()) myIndex = i;
-
 		}
 		else {
 			enemies[i - players.size()].captureData(buffor[i]);

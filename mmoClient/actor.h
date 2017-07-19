@@ -24,7 +24,6 @@ public:
 };
 
 class Player :public ActorTCPdatas {
-	std::vector <sf::Vector2f> pos;
 	int lastCharId;
 	int lastDir;
 	int frameW, frameH; // Vertical and horizontal frames indicators.
@@ -40,7 +39,7 @@ class Player :public ActorTCPdatas {
 public:
 	Player();
 	~Player();
-	void init(int);;
+	void init(int);
 	void update();
 	void captureData(ActorTCPdatas&);
 	void draw(sf::RenderWindow*);
