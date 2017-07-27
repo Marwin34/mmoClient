@@ -61,7 +61,7 @@ void Client::run(){
 
 		mainTimer = mainClock.getElapsedTime(); // Get the main time;
 		if (mainTimer.asMilliseconds() - lastUpdate.asMilliseconds() >= 33){ // Update scene and send data only every 50 milliseconds;			
-			me.update();
+			me.update(&test.getObstacles());
 			for (unsigned i = 0; i < enemies.size(); i++){
 				enemies[i].update();
 			}  

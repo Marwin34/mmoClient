@@ -39,6 +39,7 @@ public:
 	friend sf::Packet& operator >>(sf::Packet&, PlayerTCPdatas&); // Receive operator.
 };
 
+//Class defineing player that is controlled by client.
 class Player :public PlayerTCPdatas{
 	struct InputS{
 		int index;
@@ -48,6 +49,7 @@ class Player :public PlayerTCPdatas{
 	};
 
 	float drawX, drawY;
+	float spdX, spdY;
 	int id;
 	int dir;
 	int lastDir;
@@ -77,7 +79,8 @@ public:
 	void init(int);
 	void input();
 	void captureData(PlayerTCPdatas&);
-	void update();
+	void resetSpd(float x2, float y2, float width2, float height2, int direcrtion);
+	void update(std::vector<std::vector<float>> *);
 	void draw(sf::RenderWindow*);
 	void showStats();
 	void sended();
@@ -87,6 +90,7 @@ public:
 	friend sf::Packet& operator <<(sf::Packet&, const Player&); // Send operator.
 };
 
+//Class defineing other players.
 class Other :public ActorTCPdatas {
 	float x;
 	float y;
@@ -112,6 +116,7 @@ public:
 	void showStats();
 };
 
+//Clas defineing enemies on the map.
 class Enemy :public ActorTCPdatas {
 	float x, y;
 	int lastCharId;

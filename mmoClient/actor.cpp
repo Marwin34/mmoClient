@@ -52,6 +52,8 @@ Player::Player(){
 	y = 0;
 	drawX = x;
 	drawY = y;
+	spdX = 0;
+	spdY = 0;
 	sprite.setPosition(0, 0);
 	dir = 4;
 	lastDir = dir;
@@ -94,24 +96,26 @@ void Player::input(){
 	if (sf::Mouse::isButtonPressed(sf::Mouse::Left))mouseIndex = 1;
 }
 
-void Player::update(){
+void Player::update(std::vector<std::vector<float>> *obstacles){
+	spdX = 0;
+	spdY = 0;
 	if (wsadIndex == 0){
-		drawY += -2;
-		dir = 0;
+		spdY = -2;
 	}
 	if (wsadIndex == 1){
-		drawX += 2;
-		dir = 1;
+		spdX = 2;
 	}
 	if (wsadIndex == 2){
-		drawY += 2;
-		dir = 2;
+		spdY = 2;
 	}
 	if (wsadIndex == 3){
-		drawX += -2;
-		dir = 3;
+		spdX = -2;
 	}
-
+	for (unsigned j = 0; j < obstacles->size(); j++){
+		resetSpd(obstacles->at(j)[0] * 32, obstacles->at(j)[1] * 32, obstacles->at(j)[2] * 32, obstacles->at(j)[3] * 32, wsadIndex); // 32 = block size;
+	}
+	drawX += spdX;
+	drawY += spdY;
 	if (wsadIndex != 4 || mouseIndex != 0){
 		send = true;
 		inputIndex++;
@@ -123,13 +127,7 @@ void Player::update(){
 		tmp.y = drawY;
 		inputsHistory.push_back(tmp);
 	}
-	autoAttack.update(x, y, frameH);
-
-	if (attack) {
-		attack = false;
-		autoAttack.start();
-	}
-
+	dir = wsadIndex;
 	if (lastDir == dir){
 		frameW++;
 	}
@@ -144,7 +142,44 @@ void Player::update(){
 	else frameW = 17; // It points on last frame of animation.
 	lastDir = dir;
 	hpIndiactor.setScale(float(maxHp) / float(currHp), 1);
-	//std::cout << inputsHistory.size() << " , " << currHp << " , " << maxHp << std::endl;
+}
+
+void Player::resetSpd(float x2, float y2, float width2, float height2, int direcrtion){
+	if (direcrtion == 0  // TOP
+		&& drawX <= x2 + width2
+		&& x2 <= drawX + 32
+		&& drawY + spdY <= y2 + height2
+		&& y2 <= drawY + spdY + 32){
+		wsadIndex = 4;
+		spdY = 0;
+	}
+
+	if (direcrtion == 1 // RIGHT
+		&& drawX + spdX <= x2 + width2
+		&& x2 <= drawX + spdX + 32
+		&& drawY <= y2 + height2
+		&& y2 <= drawY + 32) {
+		wsadIndex = 4;
+		spdX = 0;
+	}
+
+	if (direcrtion == 2 // DOWN
+		&& drawX <= x2 + width2
+		&& x2 <= drawX + 32
+		&& drawY + spdY <= y2 + height2
+		&& y2 <= drawY + spdY + 32){
+		wsadIndex = 4;
+		spdY = 0;
+	}
+
+	if (direcrtion == 3 // LEFT
+		&& drawX + spdX <= x2 + width2
+		&& x2 <= drawX +spdX + 32
+		&& drawY <= y2 + height2
+		&& y2 <= drawY + 32){
+		wsadIndex = 4;
+		spdX = 0;
+	}
 }
 
 void Player::captureData(PlayerTCPdatas &data){
