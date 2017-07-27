@@ -14,6 +14,7 @@ Client::Client() : r_thread(&Client::receive, this){
 	wsadIndex = 4;
 
 	mainManager.load();
+	me.loadGraphics();
 
 	mouseButtonIndex = 0;
 
@@ -54,19 +55,13 @@ void Client::run(){
 			if (event.type == sf::Event::GainedFocus) focused = 1; // Gaining focus.
 			if (focused) {
 				if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape)) window.close();
-				wsadIndex = 4;
-				if (sf::Keyboard::isKeyPressed(sf::Keyboard::W)) wsadIndex = 0;
-				if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)) wsadIndex = 1;
-				if (sf::Keyboard::isKeyPressed(sf::Keyboard::S)) wsadIndex = 2;
-				if (sf::Keyboard::isKeyPressed(sf::Keyboard::A)) wsadIndex = 3;
-				mouseButtonIndex = 0;
-				if (sf::Mouse::isButtonPressed(sf::Mouse::Left))mouseButtonIndex = 1;
+				me.input();
 			}
 		}
 
 		mainTimer = mainClock.getElapsedTime(); // Get the main time;
-		if (mainTimer.asMilliseconds() - lastUpdate.asMilliseconds() >= 33){ // Update scene and send data only every 50 milliseconds;
-			//std::cout << clientTick << std::endl;
+		if (mainTimer.asMilliseconds() - lastUpdate.asMilliseconds() >= 33){ // Update scene and send data only every 50 milliseconds;			
+			me.update();
 			for (unsigned i = 0; i < enemies.size(); i++){
 				enemies[i].update();
 			}  
@@ -87,6 +82,7 @@ void Client::draw(){
 	if (received) {
 		window.clear(sf::Color::Green); // Clear the window and set green color for backgroud.
 		test.draw(&window);
+		me.draw(&window);
 		for (unsigned i = 0; i < enemies.size(); i++){
 			enemies[i].draw(&window); // Draw all actors.
 		}
@@ -120,14 +116,16 @@ void Client::receive(){
 					}
 					if (type == "DATAS"){ // If packet contains player states render them.
 						std::vector<ActorTCPdatas> buffor; // Create buffor for incoming datas.
+						PlayerTCPdatas meBuffor;
 						packet >> rPlayersSize >> rEnemiesSize;
+						packet >> meBuffor;
 						//std::cout << rPlayersSize << " , " << rEnemiesSize << std::endl;
 						for (unsigned i = 0; i < rPlayersSize + rEnemiesSize; i++){
 							ActorTCPdatas tmp;
 							packet >> tmp;
 							buffor.push_back(tmp);
 						}
-						transferFromBuffor(buffor); // Copy datas from buffor to actors vector.
+						transferFromBuffor(buffor, meBuffor); // Copy datas from buffor to actors vector.
 						received = true;
 					}
 				}
@@ -141,12 +139,15 @@ void Client::receive(){
 }
 
 void Client::send(){
-	sf::Packet packet;
-	packet << wsadIndex << mouseButtonIndex;
-	socket.send(packet);
+	if (me.mustSend()){
+		sf::Packet packet;
+		packet << me;
+		socket.send(packet);
+		me.sended();
+	}
 }
 
-void Client::transferFromBuffor(std::vector<ActorTCPdatas> &buffor){
+void Client::transferFromBuffor(std::vector<ActorTCPdatas> &buffor, PlayerTCPdatas &meBuffor){
 /*	if (players.size() > rPlayersSize){
 		// Now we delete objects which server didnt send.
 		for (unsigned i = 0; i < players.size(); i++){
@@ -213,6 +214,7 @@ void Client::transferFromBuffor(std::vector<ActorTCPdatas> &buffor){
 			}
 		}
 	}*/
+	me.captureData(meBuffor);
 	players.resize(rPlayersSize);
 	enemies.resize(rEnemiesSize);
 

@@ -2,8 +2,8 @@
 
 ActorTCPdatas::ActorTCPdatas(){
 	id = 0;
-	x = 0;
-	y = 0;
+	dstX = 0;
+	dstY = 0;
 	dir = 4;
 	maxHp = 0;
 	currHp = maxHp;
@@ -18,19 +18,209 @@ int ActorTCPdatas::getId(){
 	return id;
 }
 
-sf::Packet& operator <<(sf::Packet& packet, const ActorTCPdatas& actor)
-{
-	return packet; // Empty.
-}
-
 sf::Packet& operator >>(sf::Packet& packet, ActorTCPdatas& actor)
 {
-	return packet >> actor.id >> actor.x >> actor.y >> actor.dir >> actor.sAttack >> actor.currHp >> actor.maxHp;
+	return packet >> actor.id >> actor.dstX >> actor.dstY >> actor.dir >> actor.sAttack >> actor.currHp >> actor.maxHp;
 }
 
-//Player
+PlayerTCPdatas::PlayerTCPdatas(){
+	x = 0;
+	y = 0;
+	dir = 4;
+	maxHp = 0;
+	currHp = maxHp;
+	sAttack = false;
+	dealedInput = 0;
+}
+
+PlayerTCPdatas::~PlayerTCPdatas(){
+
+}
+
+int PlayerTCPdatas::getId(){
+	return 0;
+}
+
+sf::Packet& operator >>(sf::Packet& packet, PlayerTCPdatas& actor)
+{
+	return packet >> actor.dealedInput >> actor.x >> actor.y >> actor.sAttack >> actor.currHp >> actor.maxHp;
+}
 
 Player::Player(){
+	id = 0;
+	x = 0;
+	y = 0;
+	drawX = x;
+	drawY = y;
+	sprite.setPosition(0, 0);
+	dir = 4;
+	lastDir = dir;
+	frameH = 0;
+	frameW = 0;
+	wsadIndex = 4;
+	mouseIndex = 0;
+	inputIndex = 0;
+	lastInputId = 0;
+	attack = false;
+	send = false;
+	autoAttack.init(1, x, y);
+	inputsHistory.resize(0);
+}
+
+void Player::loadGraphics(){
+	sprite.setTexture(*mainManager["player"]);
+	textureSize = mainManager["player"]->getSize();
+	sprite.setTextureRect(sf::IntRect(0, 0, textureSize.x / 5, textureSize.y / 4));
+	sprite.setOrigin((float)0, (float)(textureSize.y / 4 - 32));
+
+	hpIndiactor.setTexture(*mainManager["hpIndicator"]);
+}
+
+Player::~Player(){
+
+}
+
+void Player::init(int data){
+	id = data;
+}
+
+void Player::input(){
+	wsadIndex = 4;
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::W)) wsadIndex = 0;
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)) wsadIndex = 1;
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::S)) wsadIndex = 2;
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::A)) wsadIndex = 3;
+	mouseIndex = 0;
+	if (sf::Mouse::isButtonPressed(sf::Mouse::Left))mouseIndex = 1;
+}
+
+void Player::update(){
+	if (wsadIndex == 0){
+		drawY += -2;
+		dir = 0;
+	}
+	if (wsadIndex == 1){
+		drawX += 2;
+		dir = 1;
+	}
+	if (wsadIndex == 2){
+		drawY += 2;
+		dir = 2;
+	}
+	if (wsadIndex == 3){
+		drawX += -2;
+		dir = 3;
+	}
+
+	if (wsadIndex != 4 || mouseIndex != 0){
+		send = true;
+		inputIndex++;
+		InputS tmp;
+		tmp.index = inputIndex;
+		tmp.wsadIndex = wsadIndex;
+		tmp.mouseIndex = mouseIndex;
+		tmp.x = drawX;
+		tmp.y = drawY;
+		inputsHistory.push_back(tmp);
+	}
+	autoAttack.update(x, y, frameH);
+
+	if (attack) {
+		attack = false;
+		autoAttack.start();
+	}
+
+	if (lastDir == dir){
+		frameW++;
+	}
+	if (dir == 4 || frameW >= 16) frameW = 0;
+
+	if (!autoAttack.active()){
+		if (dir == 0) frameH = 3;
+		if (dir == 1) frameH = 2;
+		if (dir == 2) frameH = 0;
+		if (dir == 3) frameH = 1;
+	}
+	else frameW = 17; // It points on last frame of animation.
+	lastDir = dir;
+	hpIndiactor.setScale(float(maxHp) / float(currHp), 1);
+	//std::cout << inputsHistory.size() << " , " << currHp << " , " << maxHp << std::endl;
+}
+
+void Player::captureData(PlayerTCPdatas &data){
+	dealedInput = data.dealedInput;
+	x = data.x;
+	y = data.y;
+	dir = data.dir;
+	maxHp = data.maxHp;
+	currHp = data.currHp;
+	if (data.sAttack) attack = data.sAttack;
+
+	if (lastInputId != dealedInput){
+		int cnt = 0;
+		for (unsigned i = 0; i < inputsHistory.size(); i++){
+			if (dealedInput == inputsHistory[i].index){
+				//std::cout << x << " , " << y << " , " << inputsHistory[i].x << " , " << inputsHistory[i].y << std::endl;
+				if (x == inputsHistory[i].x && y == inputsHistory[i].y){
+					cnt++;
+					inputsHistory.erase(inputsHistory.begin(), inputsHistory.begin() + i);
+					break;
+				}
+				else {
+					drawX = x;
+					drawY = y;
+					inputsHistory.erase(inputsHistory.begin(), inputsHistory.begin() + i);
+				}
+			}
+		}
+		if (!cnt) {
+			drawX = x;
+			drawY = y;
+			std::cout << "tu" << std::endl;
+		}
+		lastInputId = dealedInput;
+	}
+}
+
+
+
+void Player::draw(sf::RenderWindow *win){
+	
+	sprite.setPosition(drawX, drawY);
+	hpIndiactor.setPosition(drawX - 4, drawY - 15);
+
+	sprite.setTextureRect(sf::IntRect(frameW / 4 * textureSize.x / 5, frameH * textureSize.y / 4, textureSize.x / 5, textureSize.y / 4));
+	if (frameH != 3) {
+		win->draw(sprite);
+		autoAttack.draw(win);
+	}
+	else {
+		autoAttack.draw(win);
+		win->draw(sprite);
+	}
+	win->draw(hpIndiactor);
+}
+
+void Player::sended(){
+	send = false;
+}
+
+void Player::showStats(){
+	std::cout << x << ", " << y << ", " << dir << std::endl;
+}
+
+bool Player::mustSend(){
+	return send;
+}
+
+sf::Packet& operator <<(sf::Packet& packet, const Player& player)
+{
+	return packet << player.inputIndex << player.wsadIndex << player.mouseIndex;
+}
+
+//Other players
+
+Other::Other(){
 	id = 0;
 	x = 0;
 	y = 0;
@@ -50,15 +240,21 @@ Player::Player(){
 	hpIndiactor.setTexture(*mainManager["hpIndicator"]);
 }
 
-Player::~Player(){
+Other::~Other(){
 
 }
 
-void Player::init(int data){
+void Other::init(int data){
 	id = data;
 }
 
-void Player::update(){
+void Other::update(){
+	//std::cout << dir << std::endl;
+	if (dstX > x) x += 2;
+	if (dstX < x) x -= 2;
+	if (dstY > y) y += 2;
+	if (dstY < y) y -= 2;
+
 	autoAttack.update(x, y, frameH);
 
 	if (attack) {
@@ -83,17 +279,17 @@ void Player::update(){
 	hpIndiactor.setScale(float(maxHp) / float(currHp), 1);
 }
 
-void Player::captureData(ActorTCPdatas &data){
+void Other::captureData(ActorTCPdatas &data){
 	id = data.id;
-	x = data.x;
-	y = data.y;
+	dstX = data.dstX;
+	dstY = data.dstY;
 	dir = data.dir;
 	maxHp = data.maxHp;
 	currHp = data.currHp;
 	if (data.sAttack) attack = data.sAttack;
 }
 
-void Player::draw(sf::RenderWindow *win){
+void Other::draw(sf::RenderWindow *win){
 	sprite.setPosition(x, y);
 	hpIndiactor.setPosition(x - 4, y - 15);
 
@@ -109,7 +305,7 @@ void Player::draw(sf::RenderWindow *win){
 	win->draw(hpIndiactor);
 }
 
-void Player::showStats(){
+void Other::showStats(){
 	std::cout << x << ", " << y << ", " << dir << std::endl;
 }
 
@@ -147,8 +343,10 @@ void Enemy::update(){
 
 void Enemy::captureData(ActorTCPdatas &data){
 	id = data.id;
-	x = data.x;
-	y = data.y;
+	dstX = data.dstX;
+	dstY = data.dstY;
+	x = dstX;
+	y = dstY;
 	dir = data.dir;
 	maxHp = data.maxHp;
 	currHp = data.currHp;

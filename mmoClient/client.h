@@ -17,7 +17,8 @@ class Client{
 	sf::Time mainTimer; // Create mainTimer of the client loop.
 	sf::Time lastUpdate; // Time of the last update of the client.
 
-	std::vector<Player> players;
+	Player me;
+	std::vector<Other> players;
 	std::vector<Enemy> enemies;
 	//Actor *me;
 
@@ -44,6 +45,6 @@ public:
 	void draw2(); // Drawing window and dispaying it.
 	void receive(); // Receiving messages.
 	void send(); // Sending messages.
-	void transferFromBuffor(std::vector<ActorTCPdatas>&);
+	void transferFromBuffor(std::vector<ActorTCPdatas>&, PlayerTCPdatas&);
 	bool connect(); // Connecting to the server.
 };
