@@ -20,9 +20,7 @@ class Client{
 	Player me;
 	std::vector<Other> players;
 	std::vector<Enemy> enemies;
-	//Actor *me;
 
-	int myId; // Id of client charakters.
 	int myIndex;
 	int wsadIndex; // Index of WSAD button that is pressed.
 	int clientTick;

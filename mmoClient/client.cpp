@@ -5,7 +5,6 @@ Client::Client() : r_thread(&Client::receive, this){
 	window.setFramerateLimit(30); // Set FPS limit for the window.
 	mainTimer = sf::Time::Zero; // Initialize the mainTimer.
 	lastUpdate = sf::Time::Zero; // initialize the lastUpdate timer.
-	myId = 0;
 	myIndex = 0;
 	players.resize(0);
 	focused = 1;
@@ -109,11 +108,6 @@ void Client::receive(){
 					//receiveClock.restart();
 					std::string type;
 					packet >> type;
-					if (type == "INIT"){ // If packet contains only id of player, set it.
-						packet >> myId >> clientTick;
-						std::cout << myId << std::endl;
-						received = true;
-					}
 					if (type == "DATAS"){ // If packet contains player states render them.
 						std::vector<ActorTCPdatas> buffor; // Create buffor for incoming datas.
 						PlayerTCPdatas meBuffor;
@@ -148,72 +142,6 @@ void Client::send(){
 }
 
 void Client::transferFromBuffor(std::vector<ActorTCPdatas> &buffor, PlayerTCPdatas &meBuffor){
-/*	if (players.size() > rPlayersSize){
-		// Now we delete objects which server didnt send.
-		for (unsigned i = 0; i < players.size(); i++){
-			bool exist = false;
-			for (unsigned j = 0; j < rPlayersSize; j++){
-				if (players[i].getId() == buffor[j].getId()) exist = true;
-			}
-			if (!exist) players.erase(players.begin() + i);
-		}
-	}
-	else if (players.size() < rPlayersSize){
-		// Find objects to add and add them.
-		for (unsigned j = 0; j < buffor.size(); j++){
-			bool exist = false;
-			for (unsigned i = 0; i < players.size(); i++){
-				if (buffor[j].getId() == players[i].getId()) exist = true;
-			}
-			if (!exist){
-				Player tmp;
-				tmp.init(buffor[j].getId());
-				players.push_back(tmp);
-			}
-		}
-	}
-
-	if (enemies.size() > rEnemiesSize){
-		// Now we delete objects which server didnt send.
-		for (unsigned i = 0; i < enemies.size(); i++){
-			bool exist = false;
-			for (unsigned j = rPlayersSize; j < rPlayersSize + rEnemiesSize; j++){
-				if (enemies[i].getId() == buffor[j].getId()) exist = true;
-			}
-			if (!exist) enemies.erase(enemies.begin() + i);
-		}
-	}
-	else if (enemies.size() < rEnemiesSize){
-		// Find objects to add and add them.
-		for (unsigned j = rPlayersSize; j < rPlayersSize + rEnemiesSize; j++){
-			bool exist = false;
-			for (unsigned i = 0; i < enemies.size(); i++){
-				if (buffor[j].getId() == enemies[i].getId()) exist = true;
-			}
-			if (!exist){
-				Enemy tmp;
-				tmp.init(buffor[j].getId());
-				enemies.push_back(tmp);
-			}
-		}
-	}
-
-	for (unsigned i = 0; i < players.size() + enemies.size(); i++){
-		for (unsigned j = 0; j < rPlayersSize + rEnemiesSize; j++){
-			if (i < players.size()){
-				if (j >= rPlayersSize) break;
-				if (players[i].getId() == buffor[j].getId()){
-					players[i].captureData(buffor[j]);
-				}
-			}
-			else {
-				if (j < rPlayersSize) continue;
-				if (enemies[i - players.size()].getId() == buffor[j].getId()){
-					enemies[i - players.size()].captureData(buffor[j]);
-				}
-			}
-		}
-	}*/
 	me.captureData(meBuffor);
 	players.resize(rPlayersSize);
 	enemies.resize(rEnemiesSize);

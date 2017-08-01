@@ -98,6 +98,7 @@ class Other :public ActorTCPdatas {
 	int lastDir;
 	int frameW, frameH; // Vertical and horizontal frames indicators.
 	bool attack;
+	bool firstTime; // Bool to set other players x,y after first start to avoid players moving from 0,0 to their position after initiation.
 
 	sf::Sprite sprite;
 	sf::Sprite hpIndiactor;

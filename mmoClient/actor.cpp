@@ -65,7 +65,7 @@ Player::Player(){
 	lastInputId = 0;
 	attack = false;
 	send = false;
-	autoAttack.init(1, x, y);
+	autoAttack.init(1, drawX, drawY);
 	inputsHistory.resize(0);
 }
 
@@ -76,6 +76,7 @@ void Player::loadGraphics(){
 	sprite.setOrigin((float)0, (float)(textureSize.y / 4 - 32));
 
 	hpIndiactor.setTexture(*mainManager["hpIndicator"]);
+	autoAttack.init(1, drawX, drawY);
 }
 
 Player::~Player(){
@@ -93,10 +94,11 @@ void Player::input(){
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::S)) wsadIndex = 2;
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::A)) wsadIndex = 3;
 	mouseIndex = 0;
-	if (sf::Mouse::isButtonPressed(sf::Mouse::Left))mouseIndex = 1;
+	if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) mouseIndex = 1;
 }
 
 void Player::update(std::vector<std::vector<float>> *obstacles){
+	
 	spdX = 0;
 	spdY = 0;
 	if (wsadIndex == 0){
@@ -122,7 +124,7 @@ void Player::update(std::vector<std::vector<float>> *obstacles){
 		InputS tmp;
 		tmp.index = inputIndex;
 		tmp.wsadIndex = wsadIndex;
-		tmp.mouseIndex = mouseIndex;
+		tmp.mouseIndex = 0;
 		tmp.x = drawX;
 		tmp.y = drawY;
 		inputsHistory.push_back(tmp);
@@ -133,6 +135,11 @@ void Player::update(std::vector<std::vector<float>> *obstacles){
 	}
 	if (dir == 4 || frameW >= 16) frameW = 0;
 
+	autoAttack.update(drawX, drawY, frameH);
+	if (attack) {
+		attack = false;
+		autoAttack.start();
+	}
 	if (!autoAttack.active()){
 		if (dir == 0) frameH = 3;
 		if (dir == 1) frameH = 2;
@@ -189,6 +196,7 @@ void Player::captureData(PlayerTCPdatas &data){
 	dir = data.dir;
 	maxHp = data.maxHp;
 	currHp = data.currHp;
+	//std::cout << sAttack << std::endl;
 	if (data.sAttack) attack = data.sAttack;
 
 	if (lastInputId != dealedInput){
@@ -265,6 +273,7 @@ Other::Other(){
 	frameH = 0;
 	frameW = 0;
 	attack = false;
+	firstTime = true;
 	autoAttack.init(1, x, y);
 
 	sprite.setTexture(*mainManager["player"]);
@@ -284,7 +293,7 @@ void Other::init(int data){
 }
 
 void Other::update(){
-	//std::cout << dir << std::endl;
+	//std::cout << attack << std::endl;
 	if (dstX > x) x += 2;
 	if (dstX < x) x -= 2;
 	if (dstY > y) y += 2;
@@ -318,6 +327,11 @@ void Other::captureData(ActorTCPdatas &data){
 	id = data.id;
 	dstX = data.dstX;
 	dstY = data.dstY;
+	if (firstTime){
+		x = dstX;
+		y = dstY;
+		firstTime = false;
+	}
 	dir = data.dir;
 	maxHp = data.maxHp;
 	currHp = data.currHp;
