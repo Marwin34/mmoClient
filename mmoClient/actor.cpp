@@ -98,7 +98,6 @@ void Player::input(){
 }
 
 void Player::update(std::vector<std::vector<float>> *obstacles){
-	
 	spdX = 0;
 	spdY = 0;
 	if (wsadIndex == 0){
@@ -293,7 +292,6 @@ void Other::init(int data){
 }
 
 void Other::update(){
-	//std::cout << attack << std::endl;
 	if (dstX > x) x += 2;
 	if (dstX < x) x -= 2;
 	if (dstY > y) y += 2;
