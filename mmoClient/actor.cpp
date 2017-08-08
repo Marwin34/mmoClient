@@ -366,6 +366,7 @@ Enemy::Enemy(){
 	frameH = 0;
 	frameW = 0;
 	attack = false;
+	firstTime = true;
 	autoAttack.init(1, x, y);
 
 	sprite.setTexture(*mainManager["enemy"]);
@@ -385,6 +386,33 @@ void Enemy::init(int data){
 }
 
 void Enemy::update(){
+	if (dstX > x) x += 2;
+	if (dstX < x) x -= 2;
+	if (dstY > y) y += 2;
+	if (dstY < y) y -= 2;
+
+	autoAttack.update(x, y, frameH);
+
+	if (attack) {
+		attack = false;
+		autoAttack.start();
+	}
+
+	if (lastDir == dir){
+		frameW++;
+	}
+	if (dir == 4 || frameW >= 16) frameW = 0;
+
+	if (!autoAttack.active()){
+		if (dir == 0) frameH = 3;
+		if (dir == 1) frameH = 2;
+		if (dir == 2) frameH = 0;
+		if (dir == 3) frameH = 1;
+	}
+	else frameW = 17; // It points on last frame of animation.
+	//std::cout << " update : " << attack << std::endl;
+	lastDir = dir;
+
 	hpIndiactor.setScale(float(maxHp) / float(currHp), 1);
 }
 
@@ -392,8 +420,11 @@ void Enemy::captureData(ActorTCPdatas &data){
 	id = data.id;
 	dstX = data.dstX;
 	dstY = data.dstY;
-	x = dstX;
-	y = dstY;
+	if (firstTime){
+		x = dstX;
+		y = dstY;
+		firstTime = false;
+	}
 	dir = data.dir;
 	maxHp = data.maxHp;
 	currHp = data.currHp;
